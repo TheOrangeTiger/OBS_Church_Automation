@@ -278,8 +278,8 @@ fn build_livestream(map: Vec<(u32, String)>) -> Main {
         else if map[index].0 == 4 || map[index].0 == 1 || map[index].0 == 8 { main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), &map[index].1, 50, Position {x: 0.0, y: 0.0}, 4278190080, 4294967295, 75, "center"); }
         else if map[index].0 == 7 { main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), " Our Father, who art in heaven,\n hallowed be thy Name,\n thy kingdom come,\n thy will be done,\n on earth as it is in heaven.\n Give us this day our daily bread.\n And forgive us our trespasses,\n as we forgive those who trespass against us.\n And lead us not into temptation,\n but deliver us from evil.\n For thine is the kingdom, and the power, and the glory, \n for ever and ever. Amen.", 50, Position {x: 20.0, y: 20.0}, 4278190080, 4294967295, 75, "left"); }
         else if map[index].0 == 9 {
+            let mut temp_index = index.clone() - 1;
             loop {
-                let mut temp_index = index.clone() - 1;
                 if map[temp_index].0 != 9 && map[temp_index].0 != 0 {
                     if let Some(Source::Text { settings, .. }) = main.sources.iter_mut().find(|x| {
                         if let Source::Text { name, .. } = x {
