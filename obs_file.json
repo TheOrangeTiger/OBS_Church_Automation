@@ -1,0 +1,468 @@
+{
+  "scene_order": [
+    {
+      "name": "Camera"
+    },
+    {
+      "name": "scn_In community with one another, "
+    },
+    {
+      "name": "scn_we are called to be the embodiment of God’s love in the world."
+    },
+    {
+      "name": "scn_Teaching Time: #925, Beautiful Things "
+    },
+    {
+      "name": "scn_Prelude and Ringing of the Bell "
+    },
+    {
+      "name": "scn_WE GATHER FOR WORSHIP"
+    },
+    {
+      "name": "scn_Acknowledgment of the Land"
+    },
+    {
+      "name": "scn_Gathering Song: #922, When We Are Tested"
+    },
+    {
+      "name": "scn_Sermon "
+    },
+    {
+      "name": "scn_WE RESPOND TO THE WORD"
+    },
+    {
+      "name": "scn_Sharing of the Peace "
+    },
+    {
+      "name": "scn_Lord’s Prayer"
+    },
+    {
+      "name": "scn_WE ARE SENT OUT TO SERVE"
+    },
+    {
+      "name": "scn_Announcements "
+    },
+    {
+      "name": "scn_Blessing"
+    },
+    {
+      "name": "scn_Sending Song: #925, Beautiful Things"
+    },
+    {
+      "name": "scn_Dismissal"
+    }
+  ],
+  "current_scene": "Camera",
+  "name": "Fifth Sunday in Lent, March 22nd 2026 at 11 AM",
+  "sources": [
+    {
+      "name": "Camera",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_In community with one another, ",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_we are called to be the embodiment of God’s love in the world.",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Teaching Time: #925, Beautiful Things ",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Prelude and Ringing of the Bell ",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_WE GATHER FOR WORSHIP",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Acknowledgment of the Land",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "txt_Acknowledgment of the Land",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 20.0,
+              "y": 20.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "txt_Acknowledgment of the Land",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Acknowledgment of the Land \n Trinity Lutheran Church acknowledges that \n we live and worship on the traditional \n territories of the Indigenous peoples of \n the Treaty 6 region and the Métis Nation \n of Alberta, Region 4. Together we call \n upon all of our collective, honoured \n traditions and spirits to work in \n continuing right relationship that we may \n create a more vibrant, healthy community \n for today and future generations. ",
+        "align": "left",
+        "color": 4278190080,
+        "bk_color": 4294967295,
+        "bk_opacity": 75,
+        "font": {
+          "size": 50
+        }
+      }
+    },
+    {
+      "name": "scn_Gathering Song: #922, When We Are Tested",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Sermon ",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_WE RESPOND TO THE WORD",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Sharing of the Peace ",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Lord’s Prayer",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "txt_Lord’s Prayer",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 20.0,
+              "y": 20.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "txt_Lord’s Prayer",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Our Father, who art in heaven,\n hallowed be thy Name,\n thy kingdom come,\n thy will be done,\n on earth as it is in heaven.\n Give us this day our daily bread.\n And forgive us our trespasses,\n as we forgive those who trespass against us.\n And lead us not into temptation,\n but deliver us from evil.\n For thine is the kingdom, and the power, and the glory, \n for ever and ever. Amen.",
+        "align": "left",
+        "color": 4278190080,
+        "bk_color": 4294967295,
+        "bk_opacity": 75,
+        "font": {
+          "size": 50
+        }
+      }
+    },
+    {
+      "name": "scn_WE ARE SENT OUT TO SERVE",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Announcements ",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Blessing",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Sending Song: #925, Beautiful Things",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Dismissal",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
