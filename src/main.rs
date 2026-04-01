@@ -1,4 +1,4 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+// #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use serde_derive::Serialize;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -182,6 +182,7 @@ fn bulletin_categorizer(bulliten: Vec<String>) -> Vec<(u32, String)> {
     while bulliten_index < bulliten.len() {
         let line = &bulliten[bulliten_index];
         if line.trim() == "" {}
+        else if line.contains("Acknowledgment of the Land") {map.push((2, line.clone())); bulliten_index += 1; map.push((9, bulliten[bulliten_index].clone()));}
         else if line.contains("#") {map.push((3, line.clone()));}
         else if line.contains("WE ARE SENT OUT TO SERVE") || line.contains("Announcements") || line.contains("Blessing") || line.contains("Sermon") 
             || line.contains("Sharing of the Peace") || line.contains("WE RESPOND TO THE WORD") || line.contains("In community with one another") 
