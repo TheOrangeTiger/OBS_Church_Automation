@@ -1,26 +1,31 @@
-// #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use serde_derive::Serialize;
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+use serde_derive::{Serialize, Deserialize};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::io;
 use std::fs;
 use eframe::egui;
-// fn main() {
-//     _user_interaction(bulletin_categorizer(bulletin_reader()));
-// }
-fn main() -> eframe::Result {
+fn main() {
+    let config: Config = match std::fs::read_to_string("config.toml") {
+        Ok(s) => toml::from_str::<Config>(&s).unwrap(),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            fs::write("config.toml", "# NUMBER MEANINGS\n# 0 = unidentified\n# 1 = credits\n# 2 = regular text\n# 3 = hymn\n# 4 = P: C:\n# 5 = insert empty scene\n# 6 = service name\n# 7 = lords prayer\n# 8 = special music\n# FORMAT\n# case = number\n[cases]").unwrap();
+            Config { cases: vec![] }
+        }
+        Err(e) => panic!("Failed to read config: {}", e),
+    };
     env_logger::init();
     let options = eframe::NativeOptions {
         ..Default::default()
     };
-    let data = Data {list: bulletin_categorizer(bulletin_reader()), save: false};
-    eframe::run_native(
+    let data = Data {list: bulletin_categorizer(bulletin_reader(), config.cases), save: false};
+    let _ = eframe::run_native(
         "Church OBS Automator",
         options,
         Box::new(|_| {
             Ok(Box::new(data))
         }),
-    )
+    );
 }
 struct Data {
     list: Vec<(u32, String)>,
@@ -167,7 +172,7 @@ fn bulletin_reader() -> Vec<String> {
 }
 // NUMBER MEANINGS
 // 0 = unidentified
-// 1 = reading name
+// 1 = credits
 // 2 = regular text
 // 3 = hymn
 // 4 = P: C:
@@ -175,30 +180,43 @@ fn bulletin_reader() -> Vec<String> {
 // 6 = service name
 // 7 = lords prayer
 // 8 = special music
-fn bulletin_categorizer(bulliten: Vec<String>) -> Vec<(u32, String)> {
+#[derive(Deserialize)]
+struct Config {
+    cases: Vec<(u32, String)>
+}
+fn bulletin_categorizer(bulliten: Vec<String>, cases: Vec<(u32, String)>) -> Vec<(u32, String)> {
     let mut map: Vec<(u32, String)> = vec![];
     let mut bulliten_index = 1;
     map.push((6, bulliten[0].clone()));
     while bulliten_index < bulliten.len() {
-        let line = &bulliten[bulliten_index];
-        if line.trim() == "" {}
-        else if line.contains("Acknowledgment of the Land") {map.push((2, line.clone())); bulliten_index += 1; map.push((9, bulliten[bulliten_index].clone()));}
-        else if line.contains("#") {map.push((3, line.clone()));}
-        else if line.contains("WE ARE SENT OUT TO SERVE") || line.contains("Announcements") || line.contains("Blessing") || line.contains("Sermon") 
-            || line.contains("Sharing of the Peace") || line.contains("WE RESPOND TO THE WORD") || line.contains("In community with one another") 
-            || line.contains("we are called to be the embodiment of God’s love in the world.") || line.contains("Prelude and Ringing of the Bell")
-            || line.contains("WE GATHER FOR WORSHIP") || line.contains("Dismissal")
-            {map.push((5, line.clone()));}
-        else if line.contains("Lord’s Prayer") { map.push((7, line.clone())) }
-        else {map.push((0, line.clone()));}
+        let line = bulliten[bulliten_index].trim().to_string();
+        if line != "" {
+            map.push((0, line.clone()));
+            for case in &cases {
+                if line.contains(&case.1) {
+                    if case.0 == 10  {
+                        if line.starts_with(&case.1) {
+                            map.pop();
+                            map.push((2, line.clone()));
+                            bulliten_index += 1;
+                            map.push((9, bulliten[bulliten_index].trim().to_string()));
+                        }
+                    } else {
+                        map.pop();
+                        map.push((case.0, line.clone()));
+                    }
+
+                }
+            }
+        }   
         bulliten_index += 1;
     }
     map
 }
-fn _user_interaction_legacy(mut map: Vec<(u32, String)>) {
+fn _user_interaction_cli(mut map: Vec<(u32, String)>) {
     let menu_states: Vec<&str> = vec![
         "----------------\n   Main Menu\n----------------\nPress 1 to edit the contents\nPress 2 to save the file\nPress 3 to exit", 
-        "----------------\n   Edit Menu\n----------------\nNUMBER MEANINGS\n0 = unidentified\n1 = credits\n2 = regular text\n3 = hymn\n4 = P: C:\n5 = insert empty scene\n6 = service name\n7 = lords prayer\n8 = special music"
+        "----------------\n   Edit Menu\n----------------\nNUMBER MEANINGS\n0 = unidentified\n1 = credits\n2 = regular text\n3 = hymn\n4 = P: C:\n5 = insert empty scene\n6 = service name\n7 = lords prayer\n8 = special music\n9 = with previous"
     ];
     println!("{}", menu_states[0]);
     loop {
@@ -217,8 +235,8 @@ fn _user_interaction_legacy(mut map: Vec<(u32, String)>) {
                 let mut input = String::new();
                 io::stdin().read_line(&mut input).expect("Failed to read line");
                 let input: String = input.trim().to_lowercase();
-                if input == "k" {map_index += 1}
-                else if input == "b" {map_index -= 1}
+                if input == "k" {map_index += 1;}
+                else if input == "b" {map_index -= 1;}
                 else if input == "e" {break}
                 else if input == "c" {
                     println!("What to change the number to?\n0 = unidentified\n1 = credits\n2 = regular text\n3 = hymn\n4 = P: C:\n5 = insert empty scene\n6 = service name\n7 = lords prayer\n8 = special music");
@@ -231,28 +249,9 @@ fn _user_interaction_legacy(mut map: Vec<(u32, String)>) {
                                 Err(_) => println!("Please enter a valid number")
                             }
                         };
-                        if input < 9 {map[map_index].0 = input; break}
+                        if input < 10 {map[map_index].0 = input; break}
                     }
-                    loop {
-                        println!("With previous? (y/n)");
-                        let mut input = String::new();
-                        io::stdin().read_line(&mut input).expect("Failed to read line");
-                        let input: String = input.trim().to_lowercase();
-                        if input == "y" { 
-                            let mut temp_mindex = map_index; 
-                            loop { 
-                                temp_mindex -= 1; 
-                                if map[temp_mindex].0 != 9 {
-                                    map[temp_mindex].1 = format!("{}\n{}", map[temp_mindex].1, map[map_index].1);
-                                    map[map_index].0 = 9;
-                                    break
-                                }
-                            }
-                            map_index += 1; 
-                            break 
-                        } 
-                        else if input == "n" { map_index += 1; break }
-                    }
+                    map_index += 1;
                 }
             }
         }
@@ -273,15 +272,18 @@ fn _user_interaction_legacy(mut map: Vec<(u32, String)>) {
 fn build_livestream(map: Vec<(u32, String)>) -> Main {
     let mut main = init_main(&map[0].1);
     let mut index = 0;
+    let mut back_count: usize = 0;
+    let mut fallback_count: usize = 0;
     while index < map.len() {
         if map[index].0 == 2 { main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), &wrap_text(&map[index].1, 40), 50, Position {x: 20.0, y: 20.0}, 4278190080, 4294967295, 75, "left"); }
-        else if map[index].0 == 3 || map[index].0 == 5 { main = add_scene(main, &format!("scn_{}", map[index].1)); }
+        else if map[index].0 == 3 { main = add_scene(main, &format!("scn_{}", map[index].1)); }
+        else if map[index].0 == 5 { if index + 1 >= map.len() || map[index + 1].0 != 5 { main = add_scene(main, &format!("scn_{}", map[index].1)); } }
         else if map[index].0 == 4 || map[index].0 == 1 || map[index].0 == 8 { main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), &map[index].1, 50, Position {x: 0.0, y: 0.0}, 4278190080, 4294967295, 75, "center"); }
         else if map[index].0 == 7 { main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), " Our Father, who art in heaven,\n hallowed be thy Name,\n thy kingdom come,\n thy will be done,\n on earth as it is in heaven.\n Give us this day our daily bread.\n And forgive us our trespasses,\n as we forgive those who trespass against us.\n And lead us not into temptation,\n but deliver us from evil.\n For thine is the kingdom, and the power, and the glory, \n for ever and ever. Amen.", 50, Position {x: 20.0, y: 20.0}, 4278190080, 4294967295, 75, "left"); }
         else if map[index].0 == 9 {
             let mut temp_index = index.clone() - 1;
             loop {
-                if map[temp_index].0 != 9 && map[temp_index].0 != 0 {
+                if map[temp_index].0 == 2 || map[temp_index].0 == 4 {
                     if let Some(Source::Text { settings, .. }) = main.sources.iter_mut().find(|x| {
                         if let Source::Text { name, .. } = x {
                             name == &format!("txt_{}", map[temp_index].1)
@@ -296,11 +298,20 @@ fn build_livestream(map: Vec<(u32, String)>) -> Main {
                         }
                         break
                     }
-                } else { temp_index -= 1; }
+                } else if temp_index == 0 {
+                    main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), &wrap_text(&map[index].1, 40), 50, Position {x: 20.0, y: 20.0}, 4278190080, 4294967295, 75, "left");
+                    fallback_count += 1;
+                    break
+                } else { 
+                    back_count += 1;
+                    temp_index -= 1;
+                }
             }
         }
         index += 1;
     }
+    println!("back count: {}", back_count);
+    println!("fallback count: {}", fallback_count);
     main
 }
 fn wrap_text(text: &str, width: usize) -> String {
