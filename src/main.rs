@@ -18,7 +18,7 @@ fn main() {
     let options = eframe::NativeOptions {
         ..Default::default()
     };
-    let data = Data {list: bulletin_categorizer(bulletin_reader(), config.cases), save: false};
+    let data = Data {list: bulletin_categorizer(bulletin_reader(), config.cases), save: false, multi_select: false};
     let _ = eframe::run_native(
         "Church OBS Automator",
         options,
@@ -29,17 +29,20 @@ fn main() {
 }
 struct Data {
     list: Vec<(u32, String)>,
-    save: bool
+    save: bool,
+    multi_select: bool
 }
 impl eframe::App for Data {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.horizontal(|ui| {
                 ui.heading("Church Automator");
-                ui.label("         Save Contents: ");
+                ui.label("      Save Contents: ");
                 if ui.button("save").clicked() {
                     self.save = true;
                 }
+                ui.label("        Multi Select: ");
+                ui.checkbox(&mut self.multi_select, "");
             });
             egui::ScrollArea::vertical().show(ui, |ui| {
                 ui.set_min_width(ui.available_width());
@@ -134,13 +137,13 @@ struct Name {
     name: String
 }
 fn init_main(name: &str) -> Main {
-    add_scene( 
+    add_textobj(add_scene(add_scene( 
     Main {
         scene_order: vec![],
         current_scene: "Camera".to_string(),
         name: name.to_string(),
         sources: vec![]
-    }, "Camera")
+    }, "Camera"), "Intro Slide"), "License", "Intro Slide", " Music and Images: OneLicense A - 730010 \nCCLI #3385233\n© Trinity Lutheran Church 2025", 40, Position {x: 25.0, y: 934.0}, 4281983947, 4291523388, 50, "center")
 }
 fn add_scene(mut main: Main, name: &str) -> Main {
     main.scene_order.push(Name {name: name.to_string()});
@@ -237,7 +240,7 @@ fn _user_interaction_cli(mut map: Vec<(u32, String)>) {
                 let input: String = input.trim().to_lowercase();
                 if input == "k" {map_index += 1;}
                 else if input == "b" {map_index -= 1;}
-                else if input == "e" {break}
+                else if input == "e" {break;}
                 else if input == "c" {
                     println!("What to change the number to?\n0 = unidentified\n1 = credits\n2 = regular text\n3 = hymn\n4 = P: C:\n5 = insert empty scene\n6 = service name\n7 = lords prayer\n8 = special music");
                     loop {
@@ -249,7 +252,7 @@ fn _user_interaction_cli(mut map: Vec<(u32, String)>) {
                                 Err(_) => println!("Please enter a valid number")
                             }
                         };
-                        if input < 10 {map[map_index].0 = input; break}
+                        if input < 10 {map[map_index].0 = input; break;}
                     }
                     map_index += 1;
                 }
@@ -271,6 +274,7 @@ fn _user_interaction_cli(mut map: Vec<(u32, String)>) {
 // 9 = dont insert
 fn build_livestream(map: Vec<(u32, String)>) -> Main {
     let mut main = init_main(&map[0].1);
+    main = add_textobj(main, "Service Name", "Intro Slide", &format!(" {} \n Trinity Lutheran Church - Edmonton ", map[0].1), 55, Position {x: 0.0, y: 75.0}, 4281983947, 4291523388, 50, "center");
     let mut index = 0;
     let mut back_count: usize = 0;
     let mut fallback_count: usize = 0;
@@ -278,12 +282,12 @@ fn build_livestream(map: Vec<(u32, String)>) -> Main {
         if map[index].0 == 2 { main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), &wrap_text(&map[index].1, 40), 50, Position {x: 20.0, y: 20.0}, 4278190080, 4294967295, 75, "left"); }
         else if map[index].0 == 3 { main = add_scene(main, &format!("scn_{}", map[index].1)); }
         else if map[index].0 == 5 { if index + 1 >= map.len() || map[index + 1].0 != 5 { main = add_scene(main, &format!("scn_{}", map[index].1)); } }
-        else if map[index].0 == 4 || map[index].0 == 1 || map[index].0 == 8 { main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), &map[index].1, 50, Position {x: 0.0, y: 0.0}, 4278190080, 4294967295, 75, "center"); }
+        else if map[index].0 == 4 || map[index].0 == 1 || map[index].0 == 8 { main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), &format!(" {} ", map[index].1), 50, Position {x: 0.0, y: 0.0}, 4278190080, 4294967295, 75, "center"); }
         else if map[index].0 == 7 { main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), " Our Father, who art in heaven,\n hallowed be thy Name,\n thy kingdom come,\n thy will be done,\n on earth as it is in heaven.\n Give us this day our daily bread.\n And forgive us our trespasses,\n as we forgive those who trespass against us.\n And lead us not into temptation,\n but deliver us from evil.\n For thine is the kingdom, and the power, and the glory, \n for ever and ever. Amen.", 50, Position {x: 20.0, y: 20.0}, 4278190080, 4294967295, 75, "left"); }
         else if map[index].0 == 9 {
             let mut temp_index = index.clone() - 1;
             loop {
-                if map[temp_index].0 == 2 || map[temp_index].0 == 4 {
+                if map[temp_index].0 == 1 || map[temp_index].0 == 2 || map[temp_index].0 == 4 {
                     if let Some(Source::Text { settings, .. }) = main.sources.iter_mut().find(|x| {
                         if let Source::Text { name, .. } = x {
                             name == &format!("txt_{}", map[temp_index].1)
@@ -296,12 +300,12 @@ fn build_livestream(map: Vec<(u32, String)>) -> Main {
                         } else {
                             settings.text = format!("{}\n{}", settings.text, map[index].1);
                         }
-                        break
+                        break;
                     }
                 } else if temp_index == 0 {
                     main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), &wrap_text(&map[index].1, 40), 50, Position {x: 20.0, y: 20.0}, 4278190080, 4294967295, 75, "left");
                     fallback_count += 1;
-                    break
+                    break;
                 } else { 
                     back_count += 1;
                     temp_index -= 1;
