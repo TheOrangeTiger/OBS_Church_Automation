@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My App</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <h1>Automator</h1>
+    <table>
+        <tr>
+            <td>Save File: </td>
+            <td><button id="save">Save</button></td>
+            <td>Multi Select: </td>
+            <td><input id="multi_select" type="checkbox" /></td>
+        </tr>
+    </table>
+</body>
+<script>
+    const { invoke } = window.__TAURI__.core;
+    console.log(await invoke('bulletin_reader'));
+</script>
+</html>

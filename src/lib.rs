@@ -1,89 +1,11 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use serde_derive::{Serialize, Deserialize};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::io;
 use std::fs;
-use eframe::egui;
-fn main() {
-    let config: Config = match std::fs::read_to_string("config.toml") {
-        Ok(s) => toml::from_str::<Config>(&s).unwrap(),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            fs::write("config.toml", "# NUMBER MEANINGS\n# 0 = unidentified\n# 1 = credits\n# 2 = regular text\n# 3 = hymn\n# 4 = P: C:\n# 5 = insert empty scene\n# 6 = service name\n# 7 = lords prayer\n# 8 = special music\n# FORMAT\n# case = number\n[cases]").unwrap();
-            Config { cases: vec![] }
-        }
-        Err(e) => panic!("Failed to read config: {}", e),
-    };
-    env_logger::init();
-    let options = eframe::NativeOptions {
-        ..Default::default()
-    };
-    let data = Data {list: bulletin_categorizer(bulletin_reader(), config.cases), save: false, multi_select: false};
-    let _ = eframe::run_native(
-        "Church OBS Automator",
-        options,
-        Box::new(|_| {
-            Ok(Box::new(data))
-        }),
-    );
-}
-struct Data {
-    list: Vec<(u32, String)>,
-    save: bool,
-    multi_select: bool
-}
-impl eframe::App for Data {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.horizontal(|ui| {
-                ui.heading("Church Automator");
-                ui.label("      Save Contents: ");
-                if ui.button("save").clicked() {
-                    self.save = true;
-                }
-                ui.label("        Multi Select: ");
-                ui.checkbox(&mut self.multi_select, "");
-            });
-            egui::ScrollArea::vertical().show(ui, |ui| {
-                ui.set_min_width(ui.available_width());
-                for (i, line) in &mut self.list.iter_mut().enumerate() {
-                    ui.horizontal(|ui| {
-                        let mut display: String = line.1.clone();
-                        if line.1.len() > 15 {
-                            display = line.1.clone()[..15].to_string();
-                        }
-                        ui.push_id(i, |ui| {
-                            ui.collapsing(display, |ui| {
-                                ui.label(line.1.clone());
-                            });
-                        });
-                        egui::ComboBox::from_id_salt(i)
-                            .selected_text(format!("{}", line.0))
-                            .show_ui(ui, |ui| {
-                                ui.selectable_value(&mut line.0, 0, "0 - do nothing");
-                                ui.selectable_value(&mut line.0, 1, "1 - credits");
-                                ui.selectable_value(&mut line.0, 2, "2 - regular text");
-                                ui.selectable_value(&mut line.0, 3, "3 - hymn");
-                                ui.selectable_value(&mut line.0, 4, "4 - P: C:");
-                                ui.selectable_value(&mut line.0, 5, "5 - empty scene");
-                                ui.selectable_value(&mut line.0, 6, "6 - service name");
-                                ui.selectable_value(&mut line.0, 7, "7 - lords prayer");
-                                ui.selectable_value(&mut line.0, 8, "8 - special music");
-                                ui.selectable_value(&mut line.0, 9, "9 - with previous");
-                            });
-                    });
-                }
-            });
-            if self.save {
-                self.save = false;
-                save_obs_file(build_livestream(self.list.clone()));
-            }
-        });
-    }
-}
 #[derive(Serialize)]
 #[serde(untagged)]
-enum Source {
+pub enum Source {
     Scene {
         name: String,
         enabled: bool,
@@ -97,7 +19,7 @@ enum Source {
     }
 }
 #[derive(Serialize)]
-struct TextSettings {
+pub struct TextSettings {
     text: String,
     align: String,
     color: u32,
@@ -106,37 +28,37 @@ struct TextSettings {
     font: FontSettings
 }
 #[derive(Serialize)]
-struct FontSettings {
+pub struct FontSettings {
     size: u32
 }
 #[derive(Serialize)]
-struct Items {
+pub struct Items {
     items: Vec<TextObj>
 }
 #[derive(Serialize)]
-struct TextObj {
+pub struct TextObj {
     name: String,
     visible: bool,
     scale_ref: Position,
     pos: Position
 }
 #[derive(Serialize, Clone, Copy)]
-struct Position {
+pub struct Position {
     x: f32,
     y: f32
 }
 #[derive(Serialize)]
-struct Main {
+pub struct Main {
     scene_order: Vec<Name>,
     current_scene: String,
     name: String,
     sources: Vec<Source>
 }
 #[derive(Serialize)]
-struct Name {
+pub struct Name {
     name: String
 }
-fn init_main(name: &str) -> Main {
+pub fn init_main(name: &str) -> Main {
     add_textobj(add_scene(add_scene( 
     Main {
         scene_order: vec![],
@@ -145,12 +67,12 @@ fn init_main(name: &str) -> Main {
         sources: vec![]
     }, "Camera"), "Intro Slide"), "License", "Intro Slide", " Music and Images: OneLicense A - 730010 \nCCLI #3385233\n© Trinity Lutheran Church 2025", 40, Position {x: 25.0, y: 934.0}, 4281983947, 4291523388, 50, "center")
 }
-fn add_scene(mut main: Main, name: &str) -> Main {
+pub fn add_scene(mut main: Main, name: &str) -> Main {
     main.scene_order.push(Name {name: name.to_string()});
     main.sources.push(Source::Scene { name: name.to_string(), enabled: true, id: "scene".to_string(), settings: Items { items: vec![TextObj {name: "Camera".to_string(), visible: true, scale_ref: Position { x: 1920.0, y: 1080.0 }, pos: Position { x: 0.0, y: 0.0 },}] } });
     main
 }
-fn add_textobj(mut main: Main, name: &str, scene: &str, contents: &str, fontsize: u32, position: Position, text_colour: u32, bg_colour: u32, bg_opacity: u32, align: &str) -> Main {
+pub fn add_textobj(mut main: Main, name: &str, scene: &str, contents: &str, fontsize: u32, position: Position, text_colour: u32, bg_colour: u32, bg_opacity: u32, align: &str) -> Main {
     main.sources.push(Source::Text { name: name.to_string(), id: "text_gdiplus".to_string(), settings: TextSettings { text: contents.to_string(), align: align.to_string(), font: FontSettings { size: fontsize }, color: text_colour, bk_color: bg_colour, bk_opacity: bg_opacity } });
     for source in main.sources.iter_mut() {
         if let Source::Scene {name: targeted_scene, settings, ..} = source {
@@ -166,12 +88,23 @@ fn add_textobj(mut main: Main, name: &str, scene: &str, contents: &str, fontsize
     }
     main
 }
-fn bulletin_reader() -> Vec<String> {
+pub fn bulletin_reader() -> Vec<String> {
     let mut lines = vec![];
     let f = File::open("bulletin.txt").expect("Failed to open file");
     let linestemp = BufReader::new(f);
     for line in linestemp.lines() { lines.push(line.unwrap()); }
     lines
+}
+pub fn get_config() -> Config {
+    let config: Config = match std::fs::read_to_string("config.toml") {
+        Ok(s) => toml::from_str::<Config>(&s).unwrap(),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            fs::write("config.toml", "# NUMBER MEANINGS\n# 0 = unidentified\n# 1 = credits\n# 2 = regular text\n# 3 = hymn\n# 4 = P: C:\n# 5 = insert empty scene\n# 6 = service name\n# 7 = lords prayer\n# 8 = special music\n# FORMAT\n# case = number\n[cases]").unwrap();
+            Config { cases: vec![] }
+        }
+        Err(e) => panic!("Failed to read config: {}", e),
+    };
+    config
 }
 // NUMBER MEANINGS
 // 0 = unidentified
@@ -184,10 +117,10 @@ fn bulletin_reader() -> Vec<String> {
 // 7 = lords prayer
 // 8 = special music
 #[derive(Deserialize)]
-struct Config {
+pub struct Config {
     cases: Vec<(u32, String)>
 }
-fn bulletin_categorizer(bulliten: Vec<String>, cases: Vec<(u32, String)>) -> Vec<(u32, String)> {
+pub fn bulletin_categorizer(bulliten: Vec<String>, cases: Vec<(u32, String)>) -> Vec<(u32, String)> {
     let mut map: Vec<(u32, String)> = vec![];
     let mut bulliten_index = 1;
     map.push((6, bulliten[0].clone()));
@@ -216,7 +149,7 @@ fn bulletin_categorizer(bulliten: Vec<String>, cases: Vec<(u32, String)>) -> Vec
     }
     map
 }
-fn _user_interaction_cli(mut map: Vec<(u32, String)>) {
+pub fn user_interaction_cli(mut map: Vec<(u32, String)>) {
     let menu_states: Vec<&str> = vec![
         "----------------\n   Main Menu\n----------------\nPress 1 to edit the contents\nPress 2 to save the file\nPress 3 to exit", 
         "----------------\n   Edit Menu\n----------------\nNUMBER MEANINGS\n0 = unidentified\n1 = credits\n2 = regular text\n3 = hymn\n4 = P: C:\n5 = insert empty scene\n6 = service name\n7 = lords prayer\n8 = special music\n9 = with previous"
@@ -272,7 +205,7 @@ fn _user_interaction_cli(mut map: Vec<(u32, String)>) {
 // 7 = lords prayer
 // 8 = special music
 // 9 = dont insert
-fn build_livestream(map: Vec<(u32, String)>) -> Main {
+pub fn build_livestream(map: Vec<(u32, String)>) -> Main {
     let mut main = init_main(&map[0].1);
     main = add_textobj(main, "Service Name", "Intro Slide", &format!(" {} \n Trinity Lutheran Church - Edmonton ", map[0].1), 55, Position {x: 0.0, y: 75.0}, 4281983947, 4291523388, 50, "center");
     let mut index = 0;
@@ -318,14 +251,14 @@ fn build_livestream(map: Vec<(u32, String)>) -> Main {
     println!("fallback count: {}", fallback_count);
     main
 }
-fn wrap_text(text: &str, width: usize) -> String {
+pub fn wrap_text(text: &str, width: usize) -> String {
     let ans = text.lines()
         .map(|line| wrap_line(line, width))
         .collect::<Vec<String>>()
         .join("\n");
     ans.lines().map(|line| format!(" {} ", line)).collect::<Vec<String>>().join("\n")
 }
-fn wrap_line(text: &str, width: usize) -> String {
+pub fn wrap_line(text: &str, width: usize) -> String {
     let mut result = String::new();
     let mut line_len = 0;
     for word in text.split_whitespace() {
@@ -341,6 +274,6 @@ fn wrap_line(text: &str, width: usize) -> String {
     }
     result
 }
-fn save_obs_file(main: Main) {
+pub fn save_obs_file(main: Main) {
     fs::write("obs_file.json", serde_json::to_string_pretty(&main).expect("Failed")).unwrap();
 }
