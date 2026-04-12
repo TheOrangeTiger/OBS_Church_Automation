@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Tauri App</title>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td><h1>Church Automator</h1></td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td><button id="new_file">Choose another file</button></td>
+        <td><button id="save_file">Save file</button></td>
+      </tr>
+    </table>
+    <table class="top_right_float">
+      <tr>
+        <td>
+          <button id="apply_number">Apply Number</button>
+        </td>
+        <td>
+          <select id="dropdown">
+            <option value="0">0 - Unidentified</option>
+            <option value="1">1 - Credits</option>
+            <option value="2">2 - Regular Text</option>
+            <option value="3">3 - Hymn</option>
+            <option value="4">4 - P: C:</option>
+            <option value="5">5 - Empthy Scene</option>
+            <option value="6">6 - Service Name</option>
+            <option value="7">7 - Lord's Prayer</option>
+            <option value="8">8 - Special Music</option>
+            <option value="9">9 - With Previous</option>
+          </select>
+        </tr>
+      </tr>
+    </table>
+    <table id="data"></table>
+  </body>
+  <script>
+    const { invoke } = window.__TAURI__.core;
+    const table = document.getElementById("data");
+    function add_line(line, i) {
+      const [category, text] = line;
+      const row = document.createElement("tr");
+      row.innerHTML = `<td><input type="checkbox" id="cbox_${i}"></td><td>${text}</td><td id="val_${i}" class="val">${category}</td>`;
+      table.appendChild(row);
+    }
+    function reset_data() {
+      document.getElementById("data").innerHTML = "";
+    }
+    async function load() { 
+      let i = 0;
+      let lines = await invoke("bulletin_reader");
+      if (lines[0] == "ERROR") {}
+      else {
+        lines = await invoke("bulletin_categorizer", {bulliten: lines, config: await invoke("get_config")});
+        for (const line of lines) {
+          add_line(line, i);
+          i++;
+        }
+      } 
+    }
+    async function save() {
+      let lines = [];
+      for (row of document.getElementById("data").rows) {
+        lines.push([parseInt(row.cells[2].textContent), row.cells[1].textContent]);
+      }
+      await invoke("save_obs_file", { main: await invoke("build_livestream", { map: lines }) });
+    }
+    function apply_number() {
+      for (row of document.getElementById("data").rows) {
+        if (row.cells[0].querySelector('input[type="checkbox"]').checked == true) {
+          row.cells[0].querySelector('input[type="checkbox"]').checked = false;
+          row.cells[2].textContent = document.getElementById("dropdown").value;
+        }
+      }
+    }
+    load();
+    document.getElementById("new_file").onclick = () => { reset_data(); load(); }
+    document.getElementById("save_file").onclick = () => { if (!document.getElementById("data").innerHTML == "") { save(); } }
+    document.getElementById("apply_number").onclick = () => { apply_number(); }
+  </script>
+</html>
