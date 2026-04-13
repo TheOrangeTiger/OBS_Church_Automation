@@ -24,4 +24,3 @@ dist-ssr
 *.sw?
 bulletin.txt
 obs_file.json
-config.toml

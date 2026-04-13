@@ -83,5 +83,11 @@
     document.getElementById("new_file").onclick = () => { reset_data(); load(); }
     document.getElementById("save_file").onclick = () => { if (!document.getElementById("data").innerHTML == "") { save(); } }
     document.getElementById("apply_number").onclick = () => { apply_number(); }
+    document.addEventListener('keydown', (e) => {
+      if (!isNaN(e.key)) { 
+        document.getElementById("dropdown").value = e.key;
+        apply_number();
+       }
+    });
   </script>
 </html>
