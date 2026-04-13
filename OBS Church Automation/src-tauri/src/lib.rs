@@ -1,87 +1,18 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
 use serde_derive::{Serialize, Deserialize};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::io;
 use std::fs;
-use eframe::egui;
-fn main() {
-    let config: Config = match std::fs::read_to_string("config.toml") {
-        Ok(s) => toml::from_str::<Config>(&s).unwrap(),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            fs::write("config.toml", "# NUMBER MEANINGS\n# 0 = unidentified\n# 1 = credits\n# 2 = regular text\n# 3 = hymn\n# 4 = P: C:\n# 5 = insert empty scene\n# 6 = service name\n# 7 = lords prayer\n# 8 = special music\n# FORMAT\n# case = number\n[cases]").unwrap();
-            Config { cases: vec![] }
-        }
-        Err(e) => panic!("Failed to read config: {}", e),
-    };
-    env_logger::init();
-    let options = eframe::NativeOptions {
-        ..Default::default()
-    };
-    let data = Data {list: bulletin_categorizer(bulletin_reader(), config.cases), save: false, multi_select: false};
-    let _ = eframe::run_native(
-        "Church OBS Automator",
-        options,
-        Box::new(|_| {
-            Ok(Box::new(data))
-        }),
-    );
+use tauri_plugin_dialog::DialogExt;
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
+        .invoke_handler(tauri::generate_handler![get_config, init_main, build_livestream, bulletin_categorizer, bulletin_reader, save_obs_file])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
-struct Data {
-    list: Vec<(u32, String)>,
-    save: bool,
-    multi_select: bool
-}
-impl eframe::App for Data {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.horizontal(|ui| {
-                ui.heading("Church Automator");
-                ui.label("      Save Contents: ");
-                if ui.button("save").clicked() {
-                    self.save = true;
-                }
-                ui.label("        Multi Select: ");
-                ui.checkbox(&mut self.multi_select, "");
-            });
-            egui::ScrollArea::vertical().show(ui, |ui| {
-                ui.set_min_width(ui.available_width());
-                for (i, line) in &mut self.list.iter_mut().enumerate() {
-                    ui.horizontal(|ui| {
-                        let mut display: String = line.1.clone();
-                        if line.1.len() > 15 {
-                            display = line.1.clone()[..15].to_string();
-                        }
-                        ui.push_id(i, |ui| {
-                            ui.collapsing(display, |ui| {
-                                ui.label(line.1.clone());
-                            });
-                        });
-                        egui::ComboBox::from_id_salt(i)
-                            .selected_text(format!("{}", line.0))
-                            .show_ui(ui, |ui| {
-                                ui.selectable_value(&mut line.0, 0, "0 - do nothing");
-                                ui.selectable_value(&mut line.0, 1, "1 - credits");
-                                ui.selectable_value(&mut line.0, 2, "2 - regular text");
-                                ui.selectable_value(&mut line.0, 3, "3 - hymn");
-                                ui.selectable_value(&mut line.0, 4, "4 - P: C:");
-                                ui.selectable_value(&mut line.0, 5, "5 - empty scene");
-                                ui.selectable_value(&mut line.0, 6, "6 - service name");
-                                ui.selectable_value(&mut line.0, 7, "7 - lords prayer");
-                                ui.selectable_value(&mut line.0, 8, "8 - special music");
-                                ui.selectable_value(&mut line.0, 9, "9 - with previous");
-                            });
-                    });
-                }
-            });
-            if self.save {
-                self.save = false;
-                save_obs_file(build_livestream(self.list.clone()));
-            }
-        });
-    }
-}
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 enum Source {
     Scene {
@@ -96,7 +27,7 @@ enum Source {
         settings: TextSettings
     }
 }
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct TextSettings {
     text: String,
     align: String,
@@ -105,37 +36,54 @@ struct TextSettings {
     bk_opacity: u32,
     font: FontSettings
 }
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct FontSettings {
     size: u32
 }
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct Items {
     items: Vec<TextObj>
 }
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct TextObj {
     name: String,
     visible: bool,
     scale_ref: Position,
     pos: Position
 }
-#[derive(Serialize, Clone, Copy)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
 struct Position {
     x: f32,
     y: f32
 }
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct Main {
     scene_order: Vec<Name>,
     current_scene: String,
     name: String,
     sources: Vec<Source>
 }
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct Name {
     name: String
 }
+#[derive(Deserialize, Serialize)]
+struct Config {
+    cases: Vec<(u32, String)>
+}
+#[tauri::command]
+fn get_config() -> Config {
+    let config: Config = match std::fs::read_to_string("config.toml") {
+        Ok(s) => toml::from_str::<Config>(&s).unwrap_or(Config { cases: vec![] }),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            fs::write("config.toml", "# NUMBER MEANINGS\n# 0 = unidentified\n# 1 = credits\n# 2 = regular text\n# 3 = hymn\n# 4 = P: C:\n# 5 = insert empty scene\n# 6 = service name\n# 7 = lords prayer\n# 8 = special music\n# FORMAT\n# case = number\n[cases]").unwrap();
+            Config { cases: vec![] }
+        }
+        Err(e) => panic!("Failed to read config: {}", e),
+    };
+    return config;
+}
+#[tauri::command]
 fn init_main(name: &str) -> Main {
     add_textobj(add_scene(add_scene( 
     Main {
@@ -145,11 +93,13 @@ fn init_main(name: &str) -> Main {
         sources: vec![]
     }, "Camera"), "Intro Slide"), "License", "Intro Slide", " Music and Images: OneLicense A - 730010 \nCCLI #3385233\n© Trinity Lutheran Church 2025", 40, Position {x: 25.0, y: 934.0}, 4281983947, 4291523388, 50, "center")
 }
+#[tauri::command]
 fn add_scene(mut main: Main, name: &str) -> Main {
     main.scene_order.push(Name {name: name.to_string()});
     main.sources.push(Source::Scene { name: name.to_string(), enabled: true, id: "scene".to_string(), settings: Items { items: vec![TextObj {name: "Camera".to_string(), visible: true, scale_ref: Position { x: 1920.0, y: 1080.0 }, pos: Position { x: 0.0, y: 0.0 },}] } });
     main
 }
+#[tauri::command]
 fn add_textobj(mut main: Main, name: &str, scene: &str, contents: &str, fontsize: u32, position: Position, text_colour: u32, bg_colour: u32, bg_opacity: u32, align: &str) -> Main {
     main.sources.push(Source::Text { name: name.to_string(), id: "text_gdiplus".to_string(), settings: TextSettings { text: contents.to_string(), align: align.to_string(), font: FontSettings { size: fontsize }, color: text_colour, bk_color: bg_colour, bk_opacity: bg_opacity } });
     for source in main.sources.iter_mut() {
@@ -166,12 +116,18 @@ fn add_textobj(mut main: Main, name: &str, scene: &str, contents: &str, fontsize
     }
     main
 }
-fn bulletin_reader() -> Vec<String> {
+#[tauri::command]
+fn bulletin_reader(app: tauri::AppHandle) -> Vec<String> {
     let mut lines = vec![];
-    let f = File::open("bulletin.txt").expect("Failed to open file");
-    let linestemp = BufReader::new(f);
-    for line in linestemp.lines() { lines.push(line.unwrap()); }
-    lines
+    let file_path = app.dialog().file().blocking_pick_file().map(|x| x.to_string());
+    if file_path.is_none() { return vec!["ERROR".to_string()]; }
+    else { 
+        let file_path = file_path.unwrap();
+        let f = File::open(file_path).expect("Failed to open file");
+        let linestemp = BufReader::new(f);
+        for line in linestemp.lines() { lines.push(line.unwrap()); }
+        lines
+    }
 }
 // NUMBER MEANINGS
 // 0 = unidentified
@@ -183,11 +139,9 @@ fn bulletin_reader() -> Vec<String> {
 // 6 = service name
 // 7 = lords prayer
 // 8 = special music
-#[derive(Deserialize)]
-struct Config {
-    cases: Vec<(u32, String)>
-}
-fn bulletin_categorizer(bulliten: Vec<String>, cases: Vec<(u32, String)>) -> Vec<(u32, String)> {
+#[tauri::command]
+fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u32, String)> {
+    let cases = config.cases;
     let mut map: Vec<(u32, String)> = vec![];
     let mut bulliten_index = 1;
     map.push((6, bulliten[0].clone()));
@@ -216,68 +170,11 @@ fn bulletin_categorizer(bulliten: Vec<String>, cases: Vec<(u32, String)>) -> Vec
     }
     map
 }
-fn _user_interaction_cli(mut map: Vec<(u32, String)>) {
-    let menu_states: Vec<&str> = vec![
-        "----------------\n   Main Menu\n----------------\nPress 1 to edit the contents\nPress 2 to save the file\nPress 3 to exit", 
-        "----------------\n   Edit Menu\n----------------\nNUMBER MEANINGS\n0 = unidentified\n1 = credits\n2 = regular text\n3 = hymn\n4 = P: C:\n5 = insert empty scene\n6 = service name\n7 = lords prayer\n8 = special music\n9 = with previous"
-    ];
-    println!("{}", menu_states[0]);
-    loop {
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read line");
-        let input: String = input.trim().to_lowercase();
-        if input == "3" {return}
-        else if input == "2" {save_obs_file(build_livestream(map.clone()));}
-        else if input == "1" {
-            println!("{}", menu_states[1]);
-            let mut map_index = 0;
-            while map_index < map.len() {
-                let (k, v) = map.iter().nth(map_index).unwrap();
-                println!("Keep, Change, Back or Exit (k/c/b/e)");
-                println!("{} {}", k, v);
-                let mut input = String::new();
-                io::stdin().read_line(&mut input).expect("Failed to read line");
-                let input: String = input.trim().to_lowercase();
-                if input == "k" {map_index += 1;}
-                else if input == "b" {map_index -= 1;}
-                else if input == "e" {break;}
-                else if input == "c" {
-                    println!("What to change the number to?\n0 = unidentified\n1 = credits\n2 = regular text\n3 = hymn\n4 = P: C:\n5 = insert empty scene\n6 = service name\n7 = lords prayer\n8 = special music");
-                    loop {
-                        let input: u32 = loop {
-                            let mut raw = String::new();
-                            std::io::stdin().read_line(&mut raw).unwrap();
-                            match raw.trim().parse() {
-                                Ok(n) => break n,
-                                Err(_) => println!("Please enter a valid number")
-                            }
-                        };
-                        if input < 10 {map[map_index].0 = input; break;}
-                    }
-                    map_index += 1;
-                }
-            }
-        }
-        println!("{}", menu_states[0]);
-    }
-}
-// NUMBER MEANINGS
-// 0 = unidentified
-// 1 = credits
-// 2 = regular text
-// 3 = hymn
-// 4 = P: C:
-// 5 = insert empty scene
-// 6 = service name
-// 7 = lords prayer
-// 8 = special music
-// 9 = dont insert
+#[tauri::command]
 fn build_livestream(map: Vec<(u32, String)>) -> Main {
     let mut main = init_main(&map[0].1);
     main = add_textobj(main, "Service Name", "Intro Slide", &format!(" {} \n Trinity Lutheran Church - Edmonton ", map[0].1), 55, Position {x: 0.0, y: 75.0}, 4281983947, 4291523388, 50, "center");
     let mut index = 0;
-    let mut back_count: usize = 0;
-    let mut fallback_count: usize = 0;
     while index < map.len() {
         if map[index].0 == 2 { main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), &wrap_text(&map[index].1, 40), 50, Position {x: 20.0, y: 20.0}, 4278190080, 4294967295, 75, "left"); }
         else if map[index].0 == 3 { main = add_scene(main, &format!("scn_{}", map[index].1)); }
@@ -304,20 +201,17 @@ fn build_livestream(map: Vec<(u32, String)>) -> Main {
                     }
                 } else if temp_index == 0 {
                     main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), &wrap_text(&map[index].1, 40), 50, Position {x: 20.0, y: 20.0}, 4278190080, 4294967295, 75, "left");
-                    fallback_count += 1;
                     break;
                 } else { 
-                    back_count += 1;
                     temp_index -= 1;
                 }
             }
         }
         index += 1;
     }
-    println!("back count: {}", back_count);
-    println!("fallback count: {}", fallback_count);
     main
 }
+#[tauri::command]
 fn wrap_text(text: &str, width: usize) -> String {
     let ans = text.lines()
         .map(|line| wrap_line(line, width))
@@ -325,6 +219,7 @@ fn wrap_text(text: &str, width: usize) -> String {
         .join("\n");
     ans.lines().map(|line| format!(" {} ", line)).collect::<Vec<String>>().join("\n")
 }
+#[tauri::command]
 fn wrap_line(text: &str, width: usize) -> String {
     let mut result = String::new();
     let mut line_len = 0;
@@ -341,6 +236,7 @@ fn wrap_line(text: &str, width: usize) -> String {
     }
     result
 }
+#[tauri::command]
 fn save_obs_file(main: Main) {
-    fs::write("obs_file.json", serde_json::to_string_pretty(&main).expect("Failed")).unwrap();
+    fs::write(format!("{}.json", main.name), serde_json::to_string_pretty(&main).expect("Failed")).unwrap();
 }

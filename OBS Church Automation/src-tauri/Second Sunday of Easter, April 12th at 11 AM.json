@@ -1,0 +1,376 @@
+{
+  "scene_order": [
+    {
+      "name": "Camera"
+    },
+    {
+      "name": "Intro Slide"
+    },
+    {
+      "name": "scn_Welcome and Acknowledgment of the Land"
+    },
+    {
+      "name": "scn_Gathering Hymn: #979, Making Their Way"
+    },
+    {
+      "name": "scn_Choir: Glory to God - Rick Manolo"
+    },
+    {
+      "name": "scn_Sermon"
+    },
+    {
+      "name": "scn_Hymn of the Day: #939, Touch that Soothes and Heals"
+    },
+    {
+      "name": "scn_During the Distribution: #966, Loaves Were Broken, #933, Day of Delight"
+    },
+    {
+      "name": "scn_Blessing"
+    },
+    {
+      "name": "scn_Sending Song: #991, Go to the World"
+    },
+    {
+      "name": "scn_Dismissal"
+    }
+  ],
+  "current_scene": "Camera",
+  "name": "Second Sunday of Easter, April 12th at 11 AM",
+  "sources": [
+    {
+      "name": "Camera",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Intro Slide",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "License",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 25.0,
+              "y": 934.0
+            }
+          },
+          {
+            "name": "Service Name",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 75.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "License",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Music and Images: OneLicense A - 730010 \nCCLI #3385233\n© Trinity Lutheran Church 2025",
+        "align": "center",
+        "color": 4281983947,
+        "bk_color": 4291523388,
+        "bk_opacity": 50,
+        "font": {
+          "size": 40
+        }
+      }
+    },
+    {
+      "name": "Service Name",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Second Sunday of Easter, April 12th at 11 AM \n Trinity Lutheran Church - Edmonton ",
+        "align": "center",
+        "color": 4281983947,
+        "bk_color": 4291523388,
+        "bk_opacity": 50,
+        "font": {
+          "size": 55
+        }
+      }
+    },
+    {
+      "name": "scn_Welcome and Acknowledgment of the Land",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "txt_Welcome and Acknowledgment of the Land",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 20.0,
+              "y": 20.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "txt_Welcome and Acknowledgment of the Land",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Welcome and Acknowledgment of the Land \n Trinity Lutheran Church acknowledges that \n we live and worship on the traditional \n territories of the Indigenous peoples of \n the Treaty 6 region and the Métis Nation \n of Alberta, Region 4. Together we call \n upon all of our collective, honoured \n traditions and spirits to work in \n continuing right relationship that we may \n create a more vibrant, healthy community \n for today and future generations. \n P: The grace of our Lord Jesus Christ, \n the love of God, and the communion of the \n Holy Spirit be with you all. \n C: And also with you. \n P: God of new life and new hope \n C: We come to the empty tomb, and we see \n our own death and our own tomb. We \n remember how we have treated other \n people: members of our family, friends \n and neighbours. We come to the empty tomb \n to search within ourselves that which we \n cannot escape: the truth of who we are, a \n people caught up in the pain of our own \n brokenness, loneliness and a frustration \n of what we would be but are not. Our \n wounds are deep and we look to you for \n hope. \n P: Creator of Life \n C: In raising Christ Jesus up beyond the \n chains of death, You opened for us the \n way to eternal and abundant life. May our \n alleluias float high above the ceiling of \n what we think we know and transcend to \n the heaven of what we believe— and thus \n live. Raise us up! Renew our lives! \n Resurrect our dreams! Through Jesus \n Christ our Living Savior, Amen. \n C: Thanks be to God \n C: Thanks be to God \n P: The Gospel according to John 20:19-31 \n C: Glory to you, O Lord \n P: This is the gospel of the Lord \n C: Praise to you, O Christ. \n P: God, in your mercy \n C: Hear our prayer \n P: The Lord be with you \n C: And also with you. \n P: Lift up your hearts. \n C: We lift them to the Lord. \n P: Let us give our thanks and praise to \n the Lord our God. \n C: It is right to give our thanks and \n praise. \n P: We have testified that this mystery of \n salvation found in Jesus Christ is for \n all, when we say . . . \n C: Christ has died, Christ is risen, \n Christ will come again. ",
+        "align": "left",
+        "color": 4278190080,
+        "bk_color": 4294967295,
+        "bk_opacity": 75,
+        "font": {
+          "size": 50
+        }
+      }
+    },
+    {
+      "name": "scn_Gathering Hymn: #979, Making Their Way",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Choir: Glory to God - Rick Manolo",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Sermon",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Hymn of the Day: #939, Touch that Soothes and Heals",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_During the Distribution: #966, Loaves Were Broken, #933, Day of Delight",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Blessing",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Sending Song: #991, Go to the World",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Dismissal",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "txt_Dismissal",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 20.0,
+              "y": 20.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "txt_Dismissal",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Dismissal \n P: God is, love does C: In the footsteps \n of grace we become, and we follow! ",
+        "align": "left",
+        "color": 4278190080,
+        "bk_color": 4294967295,
+        "bk_opacity": 75,
+        "font": {
+          "size": 50
+        }
+      }
+    }
+  ]
+}
