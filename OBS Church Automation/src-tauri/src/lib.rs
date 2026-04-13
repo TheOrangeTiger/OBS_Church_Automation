@@ -73,7 +73,6 @@ struct Config {
 }
 #[tauri::command]
 fn get_config() -> Config {
-
     let config: Config = match std::fs::read_to_string("config.toml") {
         Ok(s) => toml::from_str::<Config>(&s).unwrap_or(Config { cases: vec![] }),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
@@ -83,14 +82,6 @@ fn get_config() -> Config {
         Err(e) => panic!("Failed to read config: {}", e),
     };
     return config;
-}
-async fn fetch_config() -> Config {
-    reqwest::get("https://example.com/file.txt")
-        .await
-        .unwrap()
-        .text()
-        .await
-        .unwrap()
 }
 #[tauri::command]
 fn init_main(name: &str) -> Main {
