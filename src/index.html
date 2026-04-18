@@ -29,7 +29,7 @@
             <option value="2">2 - Regular Text</option>
             <option value="3">3 - Hymn</option>
             <option value="4">4 - P: C:</option>
-            <option value="5">5 - Empthy Scene</option>
+            <option value="5">5 - Empty Scene</option>
             <option value="6">6 - Service Name</option>
             <option value="7">7 - Lord's Prayer</option>
             <option value="8">8 - Special Music</option>
@@ -46,7 +46,7 @@
     function add_line(line, i) {
       const [category, text] = line;
       const row = document.createElement("tr");
-      row.innerHTML = `<td><input type="checkbox" id="cbox_${i}"></td><td>${text}</td><td id="val_${i}" class="val">${category}</td>`;
+      row.innerHTML = `<td><input type="checkbox" id="cbox_${i}"></td><td><label for="cbox_${i}">${text}</label></td><td id="val_${i}" class="val">${category}</td>`;
       table.appendChild(row);
     }
     function reset_data() {
@@ -73,7 +73,7 @@
     }
     function apply_number() {
       for (row of document.getElementById("data").rows) {
-        if (row.cells[0].querySelector('input[type="checkbox"]').checked == true) {
+        if (row.cells[0].querySelector('input[type="checkbox"]').checked === true) {
           row.cells[0].querySelector('input[type="checkbox"]').checked = false;
           row.cells[2].textContent = document.getElementById("dropdown").value;
         }
@@ -81,13 +81,18 @@
     }
     load();
     document.getElementById("new_file").onclick = () => { reset_data(); load(); }
-    document.getElementById("save_file").onclick = () => { if (!document.getElementById("data").innerHTML == "") { save(); } }
+    document.getElementById("save_file").onclick = () => { if (!document.getElementById("data").innerHTML === "") { save(); } }
     document.getElementById("apply_number").onclick = () => { apply_number(); }
     document.addEventListener('keydown', (e) => {
       if (!isNaN(e.key)) { 
         document.getElementById("dropdown").value = e.key;
         apply_number();
-       }
+      }
+      else if (e.key === "Escape") {
+        for (row of document.getElementById("data").rows) {
+          row.cells[0].firstElementChild.checked = false;
+        }
+      }
     });
   </script>
 </html>

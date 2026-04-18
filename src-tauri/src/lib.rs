@@ -129,16 +129,6 @@ fn bulletin_reader(app: tauri::AppHandle) -> Vec<String> {
         lines
     }
 }
-// NUMBER MEANINGS
-// 0 = unidentified
-// 1 = credits
-// 2 = regular text
-// 3 = hymn
-// 4 = P: C:
-// 5 = insert empty scene
-// 6 = service name
-// 7 = lords prayer
-// 8 = special music
 #[tauri::command]
 fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u32, String)> {
     let cases = config.cases;
