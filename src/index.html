@@ -11,9 +11,9 @@
         <td><h1>Church Automator</h1></td>
       </tr>
     </table>
-    <table>
+    <table id="file_actions">
       <tr>
-        <td><button id="new_file">Choose another file</button></td>
+        <td><button id="new_file">Choose file</button></td>
         <td><button id="save_file">Save file</button></td>
       </tr>
     </table>
@@ -31,7 +31,7 @@
             <option value="4">4 - P: C:</option>
             <option value="5">5 - Empty Scene</option>
             <option value="6">6 - Service Name</option>
-            <option value="7">7 - Lord's Prayer</option>
+            <option value="0">7 - N/A</option>
             <option value="8">8 - Special Music</option>
             <option value="9">9 - With Previous</option>
           </select>
@@ -66,10 +66,11 @@
     }
     async function save() {
       let lines = [];
-      for (row of document.getElementById("data").rows) {
+      for (const row of document.getElementById("data").rows) {
         lines.push([parseInt(row.cells[2].textContent), row.cells[1].textContent]);
       }
-      await invoke("save_obs_file", { main: await invoke("build_livestream", { map: lines }) });
+      const map = await invoke("build_livestream", { map: lines });
+      await invoke("save_obs_file", { main: map });
     }
     function apply_number() {
       for (row of document.getElementById("data").rows) {
@@ -79,12 +80,11 @@
         }
       }
     }
-    load();
     document.getElementById("new_file").onclick = () => { reset_data(); load(); }
-    document.getElementById("save_file").onclick = () => { if (!document.getElementById("data").innerHTML === "") { save(); } }
+    document.getElementById("save_file").onclick = () => { if (!document.getElementById("data").innerHTML == "") { save(); } }
     document.getElementById("apply_number").onclick = () => { apply_number(); }
     document.addEventListener('keydown', (e) => {
-      if (!isNaN(e.key)) { 
+      if (!isNaN(e.key) && e.key != 7) { 
         document.getElementById("dropdown").value = e.key;
         apply_number();
       }
