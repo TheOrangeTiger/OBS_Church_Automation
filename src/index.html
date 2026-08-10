@@ -52,7 +52,7 @@
     function reset_data() {
       document.getElementById("data").innerHTML = "";
     }
-    async function load() { 
+    async function load() {
       let i = 0;
       let lines = await invoke("bulletin_reader");
       if (lines[0] == "ERROR") {}
@@ -62,7 +62,7 @@
           add_line(line, i);
           i++;
         }
-      } 
+      }
     }
     async function save() {
       let lines = [];
@@ -84,7 +84,7 @@
     document.getElementById("save_file").onclick = () => { if (!document.getElementById("data").innerHTML == "") { save(); } }
     document.getElementById("apply_number").onclick = () => { apply_number(); }
     document.addEventListener('keydown', (e) => {
-      if (!isNaN(e.key) && e.key != 7) { 
+      if (!isNaN(e.key) && e.key != 7) {
         document.getElementById("dropdown").value = e.key;
         apply_number();
       }
