@@ -20,13 +20,19 @@ To format the text, first select a paragraph
 
 <img width="652" height="271" alt="image" src="https://github.com/user-attachments/assets/a1193680-4466-4995-b14f-388a85b862b5" />
 
-Then either type a number or select a number in the top left and hit apply
+Then either type a number or select a number in the top right and hit apply
 
 <img width="566" height="586" alt="image" src="https://github.com/user-attachments/assets/077e7c07-788c-40c3-b681-af5e719d8c6f" />
 
 As a result the orange number next to the paragraph will have changed
 
 <img width="2551" height="271" alt="image" src="https://github.com/user-attachments/assets/5bc82db9-a409-41da-8f4b-c8414f068c65" />
+
+When you are satisfied with the bulletin, hit "Save File"
+
+<img width="474" height="179" alt="image" src="https://github.com/user-attachments/assets/59649b54-ffaa-4240-aecb-0d021a477bca" />
+
+Then in OBS import the json that was outputed by the program
 
 #### Here is what all the numbers do:
 
