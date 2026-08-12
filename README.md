@@ -2,7 +2,7 @@
 
 ## Automates setting up a church service for OBS
 
-#### To use UI:
+#### How do I use the GUI (Graphical User Interface)?
 
 Upon launching the program, you will be met with this screen:
 
@@ -34,8 +34,32 @@ When you are satisfied with the bulletin, hit "Save File"
 
 Then in OBS import the json that was outputed by the program
 
-#### Here is what all the numbers do:
+<img width="668" height="528" alt="image" src="https://github.com/user-attachments/assets/31d41124-d05e-4b7a-b4cf-de23d36ad8af" />
+
+<img width="1283" height="650" alt="image" src="https://github.com/user-attachments/assets/f13eb40b-70dc-477d-92e9-54472071522d" />
+
+<img width="1257" height="630" alt="image" src="https://github.com/user-attachments/assets/7230ad4d-7359-47b2-8b33-c7ae2f54c249" />
+
+#### What do the numbers do?
 
 0 and 7 Make the text not register in OBS
 
-1 and 4 Insert the text as shown in the image
+1 and 4 Insert the text as shown in the image with the intention being that you center it yourself
+
+<img width="1553" height="878" alt="image" src="https://github.com/user-attachments/assets/78df381e-6585-4c5e-be06-83eebe17167d" />
+
+2 Inserts the text as shown in the image
+
+<img width="1544" height="862" alt="image" src="https://github.com/user-attachments/assets/569f2243-f6dc-4dbf-a28d-b3528988ca47" />
+
+3, 5 and 8 Create an empty scene with the selected paragraph being the name
+
+6 Is the name of the service
+
+9 Appends (adds to the back of) text to a 1, 2 or 4
+
+For example, line 1 of the credits would be classified as 1 and line 2 would be classified as 9
+
+### How do I use the CLI (Command Line Interface)?
+
+Follow the prompts and you should get the hang of it very quickly
