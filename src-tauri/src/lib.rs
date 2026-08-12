@@ -10,6 +10,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             get_config,
+            get_help,
             init_main,
             build_livestream,
             bulletin_categorizer,
@@ -205,7 +206,8 @@ async fn bulletin_reader(app: tauri::AppHandle) -> Result<Vec<String>, u8> {
 }
 #[tauri::command]
 fn get_help() {
-    open::that("https://github.com/TheOrangeTiger/OBS_Church_Automation/blob/main/README.md");
+    let _ =
+        open::that("https://github.com/TheOrangeTiger/OBS_Church_Automation/blob/main/README.md");
 }
 #[tauri::command]
 fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u8, String)> {

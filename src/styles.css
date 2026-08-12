@@ -152,9 +152,3 @@ select {
 select:hover {
   border-color: #396cd8;
 }
-
-Key points:
-
-    appearance: none (plus the -webkit-/-moz- prefixes) is the actual fix — without it, no amount of background-color/border tweaking fully overrides the native widget chrome in every browser/webview.
-    Once you remove the native appearance, the little dropdown arrow disappears too, so you have to add it back yourself — the inline SVG background-image above does that (it's just a white chevron; recolor the stroke if you want it to match .val's orange or anything else).
-    This only styles the closed box — the popped-open <option> list is still native-rendered (per the earlier issue), so this won't change how the list itself looks when opened.
