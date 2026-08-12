@@ -186,25 +186,26 @@ fn add_textobj(
     }
     main
 }
+use std::sync::mpsc;
 #[tauri::command]
-fn bulletin_reader(app: tauri::AppHandle) -> Result<Vec<String>, u8> {
+async fn bulletin_reader(app: tauri::AppHandle) -> Result<Vec<String>, u8> {
+    let (tx, rx) = mpsc::channel();
+    app.dialog().file().pick_file(move |file_path| {
+        let _ = tx.send(file_path.map(|p| p.to_string()));
+    });
+    let file_path = rx.recv().map_err(|_| 0u8)?;
+    let file_path = file_path.ok_or(0u8)?;
+    let f = File::open(&file_path).map_err(|_| 1u8)?;
+    let reader = BufReader::new(f);
     let mut lines = vec![];
-    let file_path = app
-        .dialog()
-        .file()
-        .blocking_pick_file()
-        .map(|x| x.to_string());
-    if file_path.is_none() {
-        Err(0)
-    } else {
-        let file_path = file_path.unwrap();
-        let f = File::open(file_path).expect("Failed to open file");
-        let linestemp = BufReader::new(f);
-        for line in linestemp.lines() {
-            lines.push(line.unwrap());
-        }
-        Ok(lines)
+    for line in reader.lines() {
+        lines.push(line.map_err(|_| 2u8)?);
     }
+    Ok(lines)
+}
+#[tauri::command]
+fn get_help() {
+    open::that("https://github.com/TheOrangeTiger/OBS_Church_Automation/blob/main/README.md");
 }
 #[tauri::command]
 fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u8, String)> {
