@@ -8,6 +8,7 @@
   line-height: 24px;
   font-weight: 400;
 
+  color-scheme: light dark;
   color: #0f0f0f;
   background-color: #f6f6f6;
 
@@ -123,3 +124,37 @@ select {
     background-color: #0f0f0f69;
   }
 }
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* match the button exactly */
+  background-color: #0f0f0f98; /* same as your dark button color */
+  color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+
+  /* custom dropdown arrow since appearance:none removes the native one */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8em center;
+  background-size: 1em;
+  padding-right: 2.2em; /* room for the arrow so text doesn't overlap it */
+}
+
+select:hover {
+  border-color: #396cd8;
+}
+
+Key points:
+
+    appearance: none (plus the -webkit-/-moz- prefixes) is the actual fix — without it, no amount of background-color/border tweaking fully overrides the native widget chrome in every browser/webview.
+    Once you remove the native appearance, the little dropdown arrow disappears too, so you have to add it back yourself — the inline SVG background-image above does that (it's just a white chevron; recolor the stroke if you want it to match .val's orange or anything else).
+    This only styles the closed box — the popped-open <option> list is still native-rendered (per the earlier issue), so this won't change how the list itself looks when opened.

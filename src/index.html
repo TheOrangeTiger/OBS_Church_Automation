@@ -8,17 +8,18 @@
   <body>
     <table>
       <tr>
-        <td><h1>Church Automator</h1></td>
+        <td><h1>OBS Automator</h1></td>
       </tr>
     </table>
     <table id="file_actions">
       <tr>
         <td><button id="new_file">Choose file</button></td>
         <td><button id="save_file">Save file</button></td>
+        <td><button id="help">Help</button></td>
       </tr>
     </table>
     <table class="top_right_float">
-      <tr>
+      <td>
         <td>
           <button id="apply_number">Apply Number</button>
         </td>
@@ -35,8 +36,8 @@
             <option value="8">8 - Special Music</option>
             <option value="9">9 - With Previous</option>
           </select>
-        </tr>
-      </tr>
+        </td>
+      </td>
     </table>
     <table id="data"></table>
   </body>
@@ -55,13 +56,10 @@
     async function load() {
       let i = 0;
       let lines = await invoke("bulletin_reader");
-      if (lines[0] == "ERROR") {}
-      else {
-        lines = await invoke("bulletin_categorizer", {bulliten: lines, config: await invoke("get_config")});
-        for (const line of lines) {
-          add_line(line, i);
-          i++;
-        }
+      lines = await invoke("bulletin_categorizer", {bulliten: lines, config: await invoke("get_config")});
+      for (const line of lines) {
+        add_line(line, i);
+        i++;
       }
     }
     async function save() {
@@ -80,8 +78,12 @@
         }
       }
     }
+    async function get_help() {
+      await invoke("get_help");
+    }
     document.getElementById("new_file").onclick = () => { reset_data(); load(); }
     document.getElementById("save_file").onclick = () => { if (!document.getElementById("data").innerHTML == "") { save(); } }
+    document.getElementById("help").onclick = () => { get_help(); }
     document.getElementById("apply_number").onclick = () => { apply_number(); }
     document.addEventListener('keydown', (e) => {
       if (!isNaN(e.key) && e.key != 7) {

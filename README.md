@@ -1,3 +1,5 @@
-# Church Automator
+# OBS Church Automator
 
-automates seting up a church service using obs
+## Automates setting up a church service for OBS
+
+#### To use UI:
