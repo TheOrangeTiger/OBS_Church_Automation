@@ -1,8 +1,10 @@
 # OBS Church Automator
 
-## Automates setting up a church service for OBS
+> Automates setting up a church service for OBS
 
-#### How do I use the GUI (Graphical User Interface)?
+-----------------------------------------------------
+
+### How do I use the GUI (Graphical User Interface)?
 
 Upon launching the program, you will be met with this screen:
 
@@ -40,7 +42,7 @@ Then in OBS import the json that was outputed by the program
 
 <img width="1257" height="630" alt="image" src="https://github.com/user-attachments/assets/7230ad4d-7359-47b2-8b33-c7ae2f54c249" />
 
-#### What do the numbers do?
+### What do the numbers do?
 
 0 and 7 Make the text not register in OBS
 
