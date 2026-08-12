@@ -1,0 +1,526 @@
+{
+  "scene_order": [
+    {
+      "name": "Camera"
+    },
+    {
+      "name": "Intro Slide"
+    },
+    {
+      "name": "scn_Gathering Hymn: #821 Shout to the Lord (sung 2x)"
+    },
+    {
+      "name": "scn_Romans 10: 5-15"
+    },
+    {
+      "name": "scn_Matthew 14:22-33"
+    },
+    {
+      "name": "scn_Sermon:"
+    },
+    {
+      "name": "scn_Hymn of the Day:  #817 You have Come Down to the Lakeshore"
+    },
+    {
+      "name": "scn_Apostles’ Creed:  page 105"
+    },
+    {
+      "name": "scn_The Lord’s Prayer: page 112 (Traditional)"
+    },
+    {
+      "name": "scn_Sharing of the Peace"
+    },
+    {
+      "name": "scn_Special Music: Old Irish Blessing by Denis Agay"
+    },
+    {
+      "name": "scn_Announcements"
+    },
+    {
+      "name": "scn_Sending Song: #763 My Life Flows On in Endless Song"
+    },
+    {
+      "name": "scn_Dismissal"
+    }
+  ],
+  "current_scene": "Camera",
+  "name": "Worship Service on Sunday, August 9 at 11 AM",
+  "sources": [
+    {
+      "name": "Camera",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Intro Slide",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "License",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 25.0,
+              "y": 934.0
+            }
+          },
+          {
+            "name": "Service Name",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 75.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "License",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Music and Images: OneLicense A - 730010 \nCCLI #3385233\n© Trinity Lutheran Church 2025",
+        "align": "center",
+        "color": 4281983947,
+        "bk_color": 4291523388,
+        "bk_opacity": 50,
+        "font": {
+          "size": 40
+        }
+      }
+    },
+    {
+      "name": "Service Name",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Worship Service on Sunday, August 9 at 11 AM \n Trinity Lutheran Church - Edmonton ",
+        "align": "center",
+        "color": 4281983947,
+        "bk_color": 4291523388,
+        "bk_opacity": 50,
+        "font": {
+          "size": 55
+        }
+      }
+    },
+    {
+      "name": "scn_Gathering Hymn: #821 Shout to the Lord (sung 2x)",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Romans 10: 5-15",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "txt_Romans 10: 5-15",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 20.0,
+              "y": 20.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "txt_Romans 10: 5-15",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Romans 10: 5-15 \n Moses writes concerning the righteousness \n that comes from the law, that ‘the \n person who does these things will live by \n them.’ But the righteousness that comes \n from faith says, ‘Do not say in your \n heart, “Who will ascend into \n heaven?”’ (that is, to bring Christ \n down) ‘or “Who will descend into the \n abyss?”’ (that is, to bring Christ up \n from the dead). But what does it say? \n ‘The word is near you, on your lips and \n in your heart’ (that is, the word of \n faith that we proclaim); because if you \n confess with your lips that Jesus is Lord \n and believe in your heart that God raised \n him from the dead, you will be saved. For \n one believes with the heart and so is \n justified, and one confesses with the \n mouth and so is saved. The scripture \n says, ‘No one who believes in him will \n be put to shame.’ \n A: Word of God, word of Life C: Thanks be \n to God ",
+        "align": "left",
+        "color": 4278190080,
+        "bk_color": 4294967295,
+        "bk_opacity": 75,
+        "font": {
+          "size": 50
+        }
+      }
+    },
+    {
+      "name": "scn_Matthew 14:22-33",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "txt_Matthew 14:22-33",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 20.0,
+              "y": 20.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "txt_Matthew 14:22-33",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Matthew 14:22-33 \n Immediately he made the disciples get \n into the boat and go on ahead to the \n other side, while he dismissed the \n crowds. And after he had dismissed the \n crowds, he went up the mountain by \n himself to pray. When evening came, he \n was there alone, but by this time the \n boat, battered by the waves, was far from \n the land, for the wind was against them. \n And early in the morning he came walking \n toward them on the sea. But when the \n disciples saw him walking on the sea, \n they were terrified, saying, ‘It is a \n ghost!’ And they cried out in fear. But \n immediately Jesus spoke to them and said, \n ‘Take heart, it is I; do not be \n afraid.’ Peter answered him, ‘Lord, \n if it is you, command me to come to you \n on the water.’ He said, ‘Come.’ So \n Peter got out of the boat, started \n walking on the water, and came toward \n Jesus. But when he noticed the strong \n wind, he became frightened, and beginning \n to sink, he cried out, ‘Lord, save \n me!’ Jesus immediately reached out his \n hand and caught him, saying to him, \n ‘You of little faith, why did you \n doubt?’ When they got into the boat, \n the wind ceased. And those in the boat \n worshiped him, saying, ‘Truly you are \n the Son of God.’ ",
+        "align": "left",
+        "color": 4278190080,
+        "bk_color": 4294967295,
+        "bk_opacity": 75,
+        "font": {
+          "size": 50
+        }
+      }
+    },
+    {
+      "name": "scn_Sermon:",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Hymn of the Day:  #817 You have Come Down to the Lakeshore",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Apostles’ Creed:  page 105",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "txt_Apostles’ Creed:  page 105",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 20.0,
+              "y": 20.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "txt_Apostles’ Creed:  page 105",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Apostles’ Creed: page 105 \n I believe in God, \n the Father almighty, \n Creator of heaven and earth, \n and in Jesus Christ, his only Son, our \n Lord, \n who was conceived by the Holy Spirit, \n born of the Virgin Mary, \n suffered under Pontius Pilate, \n was crucified, died and was buried; \n he descended into hell; \n on the third day he rose again from the \n dead; \n he ascended into heaven, \n and is seated at the right hand of God \n the Father almighty; \n from there he will come to judge the \n living and the dead. \n I believe in the Holy Spirit, \n the holy catholic Church, \n the communion of saints, \n the forgiveness of sins, \n the resurrection of the body, \n and life everlasting. \n Amen. ",
+        "align": "left",
+        "color": 4278190080,
+        "bk_color": 4294967295,
+        "bk_opacity": 75,
+        "font": {
+          "size": 50
+        }
+      }
+    },
+    {
+      "name": "scn_The Lord’s Prayer: page 112 (Traditional)",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "txt_The Lord’s Prayer: page 112 (Traditional)",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 20.0,
+              "y": 20.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "txt_The Lord’s Prayer: page 112 (Traditional)",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " The Lord’s Prayer: page 112 \n (Traditional) \n Our Father, who art in heaven, \n hallowed be thy Name, \n thy kingdom come, \n thy will be done, \n on earth as it is in heaven. \n Give us this day our daily bread. \n And forgive us our trespasses, \n as we forgive those \n who trespass against us. \n And lead us not into temptation, \n but deliver us from evil. \n For thine is the kingdom, \n and the power, and the glory, \n for ever and ever. \n Amen. ",
+        "align": "left",
+        "color": 4278190080,
+        "bk_color": 4294967295,
+        "bk_opacity": 75,
+        "font": {
+          "size": 50
+        }
+      }
+    },
+    {
+      "name": "scn_Sharing of the Peace",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Special Music: Old Irish Blessing by Denis Agay",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Announcements",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Sending Song: #763 My Life Flows On in Endless Song",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "scn_Dismissal",
+      "enabled": true,
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "txt_Dismissal",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 20.0,
+              "y": 20.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "txt_Dismissal",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Dismissal ",
+        "align": "left",
+        "color": 4278190080,
+        "bk_color": 4294967295,
+        "bk_opacity": 75,
+        "font": {
+          "size": 50
+        }
+      }
+    }
+  ]
+}

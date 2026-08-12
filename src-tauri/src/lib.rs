@@ -76,14 +76,14 @@ struct Name {
 }
 #[derive(Deserialize, Serialize)]
 struct Config {
-    cases: Vec<(u32, String)>,
+    cases: Vec<(u8, String)>,
 }
 #[tauri::command]
 fn get_config() -> Config {
     let config: Config = match std::fs::read_to_string("config.toml") {
         Ok(s) => toml::from_str::<Config>(&s).unwrap_or(Config { cases: vec![] }),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            fs::write("config.toml", "# NUMBER MEANINGS\n# 0 = unidentified\n# 1 = credits\n# 2 = regular text\n# 3 = hymn\n# 4 = P: C:\n# 5 = insert empty scene\n# 6 = service name\n# 7 = N/A\n# 8 = special music\ncases = [\n#example[2, \"hello\"],\n]").unwrap();
+            fs::write("config.toml", "# NUMBER MEANINGS\n# 0 = unidentified\n# 1 = credits\n# 2 = regular text\n# 3 = hymn\n# 4 = P: C:\n# 5 = insert empty scene\n# 6 = service name\n# 7 = N/A\n# 8 = special music\n# 9 = with previous\n# 10 = this line 2 next line 9\n# FORMAT\ncases = [\n\t[2, \"hello\"],\n]\ncases = []").unwrap();
             Config { cases: vec![] }
         }
         Err(e) => panic!("Failed to read config: {}", e),
@@ -187,7 +187,7 @@ fn add_textobj(
     main
 }
 #[tauri::command]
-fn bulletin_reader(app: tauri::AppHandle) -> Vec<String> {
+fn bulletin_reader(app: tauri::AppHandle) -> Result<Vec<String>, u8> {
     let mut lines = vec![];
     let file_path = app
         .dialog()
@@ -195,7 +195,7 @@ fn bulletin_reader(app: tauri::AppHandle) -> Vec<String> {
         .blocking_pick_file()
         .map(|x| x.to_string());
     if file_path.is_none() {
-        vec!["ERROR".to_string()]
+        Err(0)
     } else {
         let file_path = file_path.unwrap();
         let f = File::open(file_path).expect("Failed to open file");
@@ -203,13 +203,13 @@ fn bulletin_reader(app: tauri::AppHandle) -> Vec<String> {
         for line in linestemp.lines() {
             lines.push(line.unwrap());
         }
-        lines
+        Ok(lines)
     }
 }
 #[tauri::command]
-fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u32, String)> {
+fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u8, String)> {
     let cases = config.cases;
-    let mut map: Vec<(u32, String)> = vec![];
+    let mut map: Vec<(u8, String)> = vec![];
     let mut bulliten_index = 1;
     map.push((6, bulliten[0].clone()));
     while bulliten_index < bulliten.len() {
@@ -326,7 +326,7 @@ fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u32, Stri
     map
 }
 #[tauri::command]
-fn build_livestream(map: Vec<(u32, String)>) -> Main {
+fn build_livestream(map: Vec<(u8, String)>) -> Main {
     let mut main = init_main(&map[0].1);
     main = add_textobj(
         main,
@@ -457,4 +457,131 @@ fn save_obs_file(main: Main) {
         serde_json::to_string_pretty(&main).expect("Failed"),
     )
     .unwrap();
+}
+use figlet_rs::FIGlet;
+use owo_colors::OwoColorize;
+// Yellow bold w \t for main messages
+// Blue for choices
+// Red bold for errors or unexpected occuences
+use std::fs::read_to_string;
+use std::io;
+pub fn cli() {
+    let font = FIGlet::standard().unwrap();
+    println!(
+        "{}{}{}{}",
+        font.convert("OBS").unwrap().yellow().bold(),
+        font.convert("Church").unwrap().yellow().bold(),
+        font.convert("Automation").unwrap().yellow().bold(),
+        font.convert(": ]").unwrap().yellow().bold()
+    );
+    'big_loop: loop {
+        println!(
+            "{}\n{}\n{}\n{}",
+            "\tWould you like to:".yellow().bold(),
+            "(1) Generate a json based on a txt file".blue(),
+            "(2) Edit an existing json".blue(),
+            "(3) Exit the program".blue()
+        );
+        let input = grab_input(Some(vec!["1", "2", "3"]));
+        match input.as_str() {
+            "1" => {
+                let txt = loop {
+                    println!("{}", "\tPlease enter the path to the txt".yellow().bold());
+                    let path = grab_input(None);
+                    if !path.ends_with(".txt") {
+                        println!("{}", "Must be a txt file".red().bold());
+                        continue;
+                    }
+                    let txt = read_to_string(&path);
+                    let Ok(s) = txt else {
+                        println!("{}{}", "Err: ".red().bold(), txt.unwrap_err().red().bold());
+                        continue;
+                    };
+                    break s.trim().to_string();
+                };
+                let mut line: usize = 0;
+                let mut sifted = bulletin_categorizer(
+                    txt.lines().map(|x| x.to_string()).collect(),
+                    get_config(),
+                );
+                loop {
+                    println!(
+                        "{}{}",
+                        "\tActions:\n".yellow().bold(),
+                        "(0) = unidentified\n(1) = credits\n(2) = regular text\n(3) = hymn\n(4) = P: C:\n(5) = insert empty scene\n(6) = service name\n(7) = N/A\n(8) = special music\n(9) = with previous\n(w) = write and exit\n() = do nothing\n(b) = go back".blue()
+                    );
+                    println!(
+                        "{}{}",
+                        sifted[line].0.bright_green(),
+                        "\tLine:".yellow().bold()
+                    );
+                    println!("{}", wrap_line(&sifted[line].1, 75).green());
+                    let action = grab_input(Some(vec![
+                        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "w", "", "b",
+                    ]));
+                    if action.as_str() == "w" {
+                        break;
+                    } else if action.is_empty() {
+                        if line <= sifted.len() {
+                            line += 1;
+                        }
+                        continue;
+                    } else if action.as_str() == "b" {
+                        if line != 0 {
+                            line -= 1;
+                        }
+                        continue;
+                    }
+                    sifted[line].0 = action.parse().unwrap_or(0);
+                }
+                save_obs_file(build_livestream(sifted));
+            }
+            "2" => {
+                println!("{}", "Editing json not yet supported".red().bold());
+                continue;
+                loop {
+                    println!("{}", "\tPlease enter the path to the json".yellow().bold());
+                    let path = grab_input(None);
+                    if !path.ends_with(".json") {
+                        println!("{}", "Must be a json file".red().bold());
+                        continue;
+                    }
+                    let txt = read_to_string(&path);
+                    let Ok(s) = txt else {
+                        println!("{}{}", "Err: ".red().bold(), txt.unwrap_err().red().bold());
+                        continue;
+                    };
+                    break;
+                }
+            }
+            "3" => {
+                break 'big_loop;
+            }
+            _ => unreachable!(),
+        }
+    }
+}
+fn grab_input(allowable_cases: Option<Vec<&str>>) -> String {
+    loop {
+        let mut input = String::new();
+        match io::stdin().read_line(&mut input) {
+            Ok(_) => {
+                if let Some(c) = &allowable_cases {
+                    if !c.contains(&&input.trim().to_lowercase().as_str()) {
+                        println!("{}", "Please provide a valid input".red().bold());
+                        continue;
+                    }
+                }
+            }
+            Err(e) => {
+                println!(
+                    "{}{e}{}",
+                    "Encountered error: ".red().bold(),
+                    "\nPlease try again".red().bold()
+                );
+                continue;
+            }
+        }
+        return input.trim().to_string();
+    }
 }
