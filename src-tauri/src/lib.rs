@@ -479,13 +479,14 @@ pub fn cli() {
     );
     'big_loop: loop {
         println!(
-            "{}\n{}\n{}\n{}",
+            "{}\n{}\n{}\n{}\n{}",
             "\tWould you like to:".yellow().bold(),
             "(1) Generate a json based on a txt file".blue(),
             "(2) Edit an existing json".blue(),
-            "(3) Exit the program".blue()
+            "(3) Exit the program".blue(),
+            "(4) Open documentation".blue()
         );
-        let input = grab_input(Some(vec!["1", "2", "3"]));
+        let input = grab_input(Some(vec!["1", "2", "3", "4"]));
         match input.as_str() {
             "1" => {
                 let txt = loop {
@@ -559,6 +560,9 @@ pub fn cli() {
             }
             "3" => {
                 break 'big_loop;
+            }
+            "4" => {
+                get_help();
             }
             _ => unreachable!(),
         }
