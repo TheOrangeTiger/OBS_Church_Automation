@@ -1,6 +1,6 @@
 # OBS Church Automator
 
-> Automates setting up a church service for OBS
+> Automates setting up a church service for OBS by taking in a txt file of the bulletin and outputting a json
 
 -----------------------------------------------------
 
@@ -44,29 +44,15 @@ Then in OBS import the json that was outputed by the program
 
 ### What do the numbers do?
 
-0 and 7 Make the text not register in OBS
-
-1, 4 and 8 Insert the text as shown in the image with the intention being that you center it yourself  
-> You cannot add text to the back of an 8
-
-<img width="1553" height="878" alt="image" src="https://github.com/user-attachments/assets/78df381e-6585-4c5e-be06-83eebe17167d" />
-
-2 Inserts the text as shown in the image
-> This is mainly intended for readings
-
-<img width="1544" height="862" alt="image" src="https://github.com/user-attachments/assets/569f2243-f6dc-4dbf-a28d-b3528988ca47" />
-
-3 and 5 Create an empty scene with the selected paragraph being the name
-> Paragraphs selected with 5 are merged into the last consecutive one
-> You are expected to insert an image of the hymn yourself with 3
-
-6 Is the name of the service
-> The name is selected based on the first paragraph labeled with 6
-> If no paragraph is labeled with 6, the first paragraph is chosen
-
-9 Adds text of the selected paragraph to a 1, 2 or 4
-> For example, the name of the reading might be assigned 2 and the reading itself assigned 9
-
-### How do I use the CLI (Command Line Interface)?
-
-Follow the prompts and you should get the hang of it very quickly
+|Number|Use Case|Explanation|
+|-----:|:-------|:----------|
+|0|||
+|1|||
+|2|||
+|3|||
+|4|||
+|5|||
+|6|||
+|7|||
+|8|||
+|9|||
