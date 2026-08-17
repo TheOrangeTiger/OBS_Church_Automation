@@ -29,3 +29,11 @@ owo-colors = "4.3.0"
 figlet-rs = "1.0.0"
 open = "5.4.1"
 
+[profile.dev]
+debug = "line-tables-only"
+
+[build]
+rustflags = ["-Z", "threads=8"]
+
+[unstable]
+codegen-backend = true

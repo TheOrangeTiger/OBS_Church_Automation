@@ -11,7 +11,6 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_config,
             get_help,
-            init_main,
             build_livestream,
             bulletin_categorizer,
             bulletin_reader,
@@ -71,6 +70,94 @@ struct Main {
     name: String,
     sources: Vec<Source>,
 }
+impl Main {
+    fn new(name: &str) -> Self {
+        let mut main = Main {
+            scene_order: vec![],
+            current_scene: "Camera".to_string(),
+            name: name.to_string(),
+            sources: vec![],
+        };
+        main.add_scene("Camera");
+        main.add_scene("Intro Slide");
+        main.add_text_obj("License",
+            "Intro Slide",
+            " Music and Images: OneLicense A - 730010 \nCCLI #3385233\n© Trinity Lutheran Church 2025",
+            40,
+            Position { x: 25.0, y: 934.0 },
+            4281983947,
+            4291523388,
+            50,
+            "center",);
+        main
+    }
+    fn add_text_obj(
+        &mut self,
+        name: &str,
+        scene: &str,
+        contents: &str,
+        fontsize: u32,
+        position: Position,
+        text_colour: u32,
+        bg_colour: u32,
+        bg_opacity: u32,
+        align: &str,
+    ) {
+        self.sources.push(Source::Text {
+            name: name.to_string(),
+            id: "text_gdiplus".to_string(),
+            settings: TextSettings {
+                text: contents.to_string(),
+                align: align.to_string(),
+                font: FontSettings { size: fontsize },
+                color: text_colour,
+                bk_color: bg_colour,
+                bk_opacity: bg_opacity,
+            },
+        });
+        for source in self.sources.iter_mut() {
+            if let Source::Scene {
+                name: targeted_scene,
+                settings,
+                ..
+            } = source
+            {
+                if targeted_scene == scene {
+                    settings.items.push(TextObj {
+                        name: name.to_string(),
+                        visible: true,
+                        scale_ref: Position {
+                            x: 1920.0,
+                            y: 1080.0,
+                        },
+                        pos: position,
+                    });
+                }
+            }
+        }
+    }
+    fn add_scene(&mut self, name: &str) {
+        self.scene_order.push(Name {
+            name: name.to_string(),
+        });
+        self.sources.push(Source::Scene {
+            name: name.to_string(),
+            enabled: true,
+            id: "scene".to_string(),
+            settings: Items {
+                items: vec![TextObj {
+                    name: "Camera".to_string(),
+                    visible: true,
+                    scale_ref: Position {
+                        x: 1920.0,
+                        y: 1080.0,
+                    },
+                    pos: Position { x: 0.0, y: 0.0 },
+                }],
+            },
+        });
+    }
+}
 #[derive(Serialize, Deserialize)]
 struct Name {
     name: String,
@@ -84,108 +171,12 @@ fn get_config() -> Config {
     let config: Config = match std::fs::read_to_string("config.toml") {
         Ok(s) => toml::from_str::<Config>(&s).unwrap_or(Config { cases: vec![] }),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            fs::write("config.toml", "# NUMBER MEANINGS\n# 0 = unidentified\n# 1 = credits\n# 2 = regular text\n# 3 = hymn\n# 4 = P: C:\n# 5 = insert empty scene\n# 6 = service name\n# 7 = N/A\n# 8 = special music\n# 9 = with previous\n# 10 = this line 2 next line 9\n# FORMAT\ncases = [\n\t[2, \"hello\"],\n]\ncases = []").unwrap();
+            let _ = fs::write("config.toml", "# NUMBER MEANINGS\n# 0 = unidentified\n# 1 = credits\n# 2 = readings\n# 3 = hymn\n# 4 = P: C:\n# 5 = insert empty scene\n# 6 = service name\n# 7 = N/A\n# 8 = special music\n# 9 = with previous\n# 10 = this line 2 next line 9\n# FORMAT\ncases = [\n\t[2, \"hello\"],\n]\ncases = []");
             Config { cases: vec![] }
         }
-        Err(e) => panic!("Failed to read config: {}", e),
+        Err(_) => Config { cases: vec![] },
     };
     config
-}
-#[tauri::command]
-fn init_main(name: &str) -> Main {
-    add_textobj(
-        add_scene(
-            add_scene(
-                Main {
-                    scene_order: vec![],
-                    current_scene: "Camera".to_string(),
-                    name: name.to_string(),
-                    sources: vec![],
-                },
-                "Camera",
-            ),
-            "Intro Slide",
-        ),
-        "License",
-        "Intro Slide",
-        " Music and Images: OneLicense A - 730010 \nCCLI #3385233\n© Trinity Lutheran Church 2025",
-        40,
-        Position { x: 25.0, y: 934.0 },
-        4281983947,
-        4291523388,
-        50,
-        "center",
-    )
-}
-#[tauri::command]
-fn add_scene(mut main: Main, name: &str) -> Main {
-    main.scene_order.push(Name {
-        name: name.to_string(),
-    });
-    main.sources.push(Source::Scene {
-        name: name.to_string(),
-        enabled: true,
-        id: "scene".to_string(),
-        settings: Items {
-            items: vec![TextObj {
-                name: "Camera".to_string(),
-                visible: true,
-                scale_ref: Position {
-                    x: 1920.0,
-                    y: 1080.0,
-                },
-                pos: Position { x: 0.0, y: 0.0 },
-            }],
-        },
-    });
-    main
-}
-#[tauri::command]
-fn add_textobj(
-    mut main: Main,
-    name: &str,
-    scene: &str,
-    contents: &str,
-    fontsize: u32,
-    position: Position,
-    text_colour: u32,
-    bg_colour: u32,
-    bg_opacity: u32,
-    align: &str,
-) -> Main {
-    main.sources.push(Source::Text {
-        name: name.to_string(),
-        id: "text_gdiplus".to_string(),
-        settings: TextSettings {
-            text: contents.to_string(),
-            align: align.to_string(),
-            font: FontSettings { size: fontsize },
-            color: text_colour,
-            bk_color: bg_colour,
-            bk_opacity: bg_opacity,
-        },
-    });
-    for source in main.sources.iter_mut() {
-        if let Source::Scene {
-            name: targeted_scene,
-            settings,
-            ..
-        } = source
-        {
-            if targeted_scene == scene {
-                settings.items.push(TextObj {
-                    name: name.to_string(),
-                    visible: true,
-                    scale_ref: Position {
-                        x: 1920.0,
-                        y: 1080.0,
-                    },
-                    pos: position,
-                });
-            }
-        }
-    }
-    main
 }
 use std::sync::mpsc;
 #[tauri::command]
@@ -330,12 +321,15 @@ fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u8, Strin
 }
 #[tauri::command]
 fn build_livestream(map: Vec<(u8, String)>) -> Main {
-    let mut main = init_main(&map[0].1);
-    main = add_textobj(
-        main,
+    let name = match map.iter().find(|(k, _)| *k == 6).map(|(_, v)| v) {
+        Some(x) => x.to_string(),
+        None => map[0].1.clone(),
+    };
+    let mut main = Main::new(name.as_str());
+    main.add_text_obj(
         "Service Name",
         "Intro Slide",
-        &format!(" {} \n Trinity Lutheran Church - Edmonton ", map[0].1),
+        &format!(" {} \n Trinity Lutheran Church - Edmonton ", name),
         55,
         Position { x: 0.0, y: 75.0 },
         4281983947,
@@ -345,10 +339,10 @@ fn build_livestream(map: Vec<(u8, String)>) -> Main {
     );
     let mut index = 0;
     while index < map.len() {
+        // 0 and 7 are skipped
         if map[index].0 == 2 {
-            main = add_scene(main, &format!("scn_{}", map[index].1));
-            main = add_textobj(
-                main,
+            main.add_scene(&format!("scn_{}", map[index].1));
+            main.add_text_obj(
                 &format!("txt_{}", map[index].1),
                 &format!("scn_{}", map[index].1),
                 &wrap_text(&map[index].1, 40),
@@ -360,18 +354,17 @@ fn build_livestream(map: Vec<(u8, String)>) -> Main {
                 "left",
             );
         } else if map[index].0 == 3 {
-            main = add_scene(main, &format!("scn_{}", map[index].1));
+            main.add_scene(&format!("scn_{}", map[index].1));
         } else if map[index].0 == 5 {
             if index + 1 >= map.len() || map[index + 1].0 != 5 {
-                main = add_scene(main, &format!("scn_{}", map[index].1));
+                main.add_scene(&format!("scn_{}", map[index].1));
             }
         } else if map[index].0 == 4 || map[index].0 == 1 || map[index].0 == 8 {
-            main = add_scene(main, &format!("scn_{}", map[index].1));
-            main = add_textobj(
-                main,
+            main.add_scene(&format!("scn_{}", map[index].1));
+            main.add_text_obj(
                 &format!("txt_{}", map[index].1),
                 &format!("scn_{}", map[index].1),
-                &format!(" {} ", map[index].1),
+                &wrap_text(&map[index].1, 100),
                 50,
                 Position { x: 0.0, y: 0.0 },
                 4278190080,
@@ -379,9 +372,7 @@ fn build_livestream(map: Vec<(u8, String)>) -> Main {
                 75,
                 "center",
             );
-        }
-        // else if map[index].0 == 7 { main = add_scene(main, &format!("scn_{}", map[index].1)); main = add_textobj(main, &format!("txt_{}", map[index].1), &format!("scn_{}", map[index].1), " Our Father, who art in heaven,\n hallowed be thy Name,\n thy kingdom come,\n thy will be done,\n on earth as it is in heaven.\n Give us this day our daily bread.\n And forgive us our trespasses,\n as we forgive those who trespass against us.\n And lead us not into temptation,\n but deliver us from evil.\n For thine is the kingdom, and the power, and the glory, \n for ever and ever. Amen.", 50, Position {x: 20.0, y: 20.0}, 4278190080, 4294967295, 75, "left"); }
-        else if map[index].0 == 9 {
+        } else if map[index].0 == 9 {
             let mut temp_index = index - 1;
             loop {
                 if map[temp_index].0 == 1 || map[temp_index].0 == 2 || map[temp_index].0 == 4 {
@@ -401,9 +392,8 @@ fn build_livestream(map: Vec<(u8, String)>) -> Main {
                         break;
                     }
                 } else if temp_index == 0 {
-                    main = add_scene(main, &format!("scn_{}", map[index].1));
-                    main = add_textobj(
-                        main,
+                    main.add_scene(&format!("scn_{}", map[index].1));
+                    main.add_text_obj(
                         &format!("txt_{}", map[index].1),
                         &format!("scn_{}", map[index].1),
                         &wrap_text(&map[index].1, 40),
@@ -424,7 +414,6 @@ fn build_livestream(map: Vec<(u8, String)>) -> Main {
     }
     main
 }
-#[tauri::command]
 fn wrap_text(text: &str, width: usize) -> String {
     let ans = text
         .lines()
@@ -436,7 +425,6 @@ fn wrap_text(text: &str, width: usize) -> String {
         .collect::<Vec<String>>()
         .join("\n")
 }
-#[tauri::command]
 fn wrap_line(text: &str, width: usize) -> String {
     let mut result = String::new();
     let mut line_len = 0;
@@ -455,11 +443,10 @@ fn wrap_line(text: &str, width: usize) -> String {
 }
 #[tauri::command]
 fn save_obs_file(main: Main) {
-    fs::write(
+    let _ = fs::write(
         format!("{}.json", main.name),
-        serde_json::to_string_pretty(&main).expect("Failed"),
-    )
-    .unwrap();
+        serde_json::to_string_pretty(&main).unwrap_or("Failed to save JSON".to_string()),
+    );
 }
 use figlet_rs::FIGlet;
 use owo_colors::OwoColorize;
