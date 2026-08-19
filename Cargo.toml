@@ -12,6 +12,8 @@ serde_derive = "1.0.228"
 owo-colors = "4.3.0"
 figlet-rs = "1.0.0"
 open = "5.4.1"
+eframe = "0.36.1"
+rfd = "0.17.2"
 
 [profile.dev]
 debug = "line-tables-only"

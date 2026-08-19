@@ -1,1 +1,0 @@
-rustc: /var/lib/flatpak/app/dev.zed.Zed/x86_64/stable/760c1810b388255913dee7f84ac125b19ab7541142605be230708522d3dce1cf/files/lib/libselinux.so.1: no version information available (required by /lib64/libkrb5support.so.0)

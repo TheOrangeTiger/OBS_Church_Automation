@@ -1,5 +1,9 @@
-mod lib;
-use lib::cli;
+mod backend;
+mod cli;
+mod ui;
+// use cli::cli;
+use ui::ui;
 fn main() {
-    cli();
+    // cli();
+    let _ = ui();
 }
