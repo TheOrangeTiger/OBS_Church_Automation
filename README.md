@@ -8,31 +8,35 @@
 
 Upon launching the program, you will be met with this screen:
 
-<img width="2559" height="1529" alt="image" src="https://github.com/user-attachments/assets/5613a6b8-4357-429d-8920-b018ec827398" />
+<img width="1920" height="1051" alt="image" src="https://github.com/user-attachments/assets/754f7ab5-67a1-40f8-b609-367154096bf4" />
 
 To begin, copy and paste the contents of a bulletin to a TXT file, then select that file with the "Choose File" button
 
-<img width="471" height="204" alt="image" src="https://github.com/user-attachments/assets/360b0151-9e77-4d97-a09c-65915dd350f2" />
-
 Then the file will be loaded to the program
 
-<img width="2559" height="479" alt="image" src="https://github.com/user-attachments/assets/25bbd51e-1525-4a65-9c6d-0f5af1b6f7d0" />
+<img width="1920" height="287" alt="image" src="https://github.com/user-attachments/assets/e58829b4-f411-41e0-86f6-dae97b6afc45" />
 
 To format the text, first select a paragraph
 
-<img width="652" height="271" alt="image" src="https://github.com/user-attachments/assets/a1193680-4466-4995-b14f-388a85b862b5" />
+<img width="349" height="205" alt="image" src="https://github.com/user-attachments/assets/fbe320a9-c480-48e7-a74e-5ead45b82d75" />
 
-Then either type a number or select a number in the top right and hit apply
+> You can also click on the paragraph itself to select it
 
-<img width="566" height="586" alt="image" src="https://github.com/user-attachments/assets/077e7c07-788c-40c3-b681-af5e719d8c6f" />
+Then either type a number on your keyboard or select a number in the top right and hit apply
+
+<img width="366" height="315" alt="image" src="https://github.com/user-attachments/assets/b0c7cad4-1e0c-4389-89bc-5c75e18410c2" />
 
 As a result the orange number next to the paragraph will have changed
 
-<img width="2551" height="271" alt="image" src="https://github.com/user-attachments/assets/5bc82db9-a409-41da-8f4b-c8414f068c65" />
+<img width="332" height="71" alt="image" src="https://github.com/user-attachments/assets/9232defa-cbea-425d-845a-11267fe116cd" />
 
 When you are satisfied with the bulletin, hit "Save File"
 
-<img width="474" height="179" alt="image" src="https://github.com/user-attachments/assets/59649b54-ffaa-4240-aecb-0d021a477bca" />
+If you want to double check your work, you can select Preview Mode and it will show you roughly what the service will look like in OBS
+
+<img width="446" height="77" alt="image" src="https://github.com/user-attachments/assets/085431bf-d643-4f44-8dfa-694cd590984b" />
+
+>To navigate the scenes, use the Next and Previous Scene buttons
 
 Then in OBS import the JSON that was outputed by the program
 
