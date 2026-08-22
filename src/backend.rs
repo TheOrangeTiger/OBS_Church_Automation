@@ -1,3 +1,4 @@
+use eframe::egui::Color32;
 use serde_derive::{Deserialize, Serialize};
 use std::fs;
 #[derive(Serialize, Deserialize)]
@@ -5,7 +6,6 @@ use std::fs;
 enum Source {
     Scene {
         name: String,
-        enabled: bool,
         id: String,
         settings: Items,
     },
@@ -13,6 +13,7 @@ enum Source {
         name: String,
         id: String,
         settings: TextSettings,
+        filters: Vec<ScrollFilter>,
     },
 }
 #[derive(Serialize, Deserialize)]
@@ -38,6 +39,30 @@ struct TextObj {
     visible: bool,
     scale_ref: Position,
     pos: Position,
+}
+#[derive(Serialize, Deserialize, Clone)]
+struct ScrollFilter {
+    name: String,
+    id: String,
+    settings: ScrollFilterSettings,
+}
+impl ScrollFilter {
+    fn from_speed(speed: f32) -> Self {
+        ScrollFilter {
+            name: "Scroll".to_string(),
+            id: "scroll_filter".to_string(),
+            settings: ScrollFilterSettings {
+                speed_y: speed,
+                looping: false,
+            },
+        }
+    }
+}
+#[derive(Serialize, Deserialize, Clone)]
+struct ScrollFilterSettings {
+    speed_y: f32,
+    #[serde(rename = "loop")]
+    looping: bool,
 }
 #[derive(Serialize, Deserialize, Clone, Copy)]
 struct Position {
@@ -69,7 +94,9 @@ impl Main {
             4281983947,
             4291523388,
             50,
-            "center",);
+            "center",
+            false,
+        );
         main
     }
     fn add_text_obj(
@@ -83,7 +110,12 @@ impl Main {
         bg_colour: u32,
         bg_opacity: u32,
         align: &str,
+        include_scroll: bool,
     ) {
+        let mut filters = vec![];
+        if include_scroll {
+            filters.push(ScrollFilter::from_speed(10.0)); // 10 is the right magic number for the fontsize :)
+        }
         self.sources.push(Source::Text {
             name: name.to_string(),
             id: "text_gdiplus".to_string(),
@@ -95,6 +127,7 @@ impl Main {
                 bk_color: bg_colour,
                 bk_opacity: bg_opacity,
             },
+            filters,
         });
         for source in self.sources.iter_mut() {
             if let Source::Scene {
@@ -123,7 +156,6 @@ impl Main {
         });
         self.sources.push(Source::Scene {
             name: name.to_string(),
-            enabled: true,
             id: "scene".to_string(),
             settings: Items {
                 items: vec![TextObj {
@@ -146,6 +178,67 @@ struct Name {
 #[derive(Deserialize, Serialize, Clone)]
 pub struct Config {
     cases: Vec<(u8, String)>,
+}
+#[derive(Debug, PartialEq, Clone)]
+pub struct Scene {
+    pub contents: Option<String>,
+    pub name: String,
+    pub col: Color32,
+    pub bg: Color32,
+    pub will_it_scroll: bool,
+}
+impl Scene {
+    fn from_map_slice(slice: (u8, String)) -> Option<Scene> {
+        let mut p = 30;
+        if slice.1.len() < p {
+            p = slice.1.len()
+        }
+        let name: String = slice.1[..p].to_string();
+        match slice.0 {
+            1 | 4 | 8 => Some(Scene {
+                contents: Some(wrap_text(slice.1.as_str(), 75)),
+                name,
+                col: Color32::from_hex("#000000").unwrap_or(Color32::default()),
+                bg: Color32::from_hex("#FFFFFF").unwrap_or(Color32::default()),
+                will_it_scroll: false,
+            }),
+            2 => Some(Scene {
+                contents: Some(wrap_text(slice.1.as_str(), 40)),
+                name,
+                col: Color32::from_hex("#000000").unwrap_or(Color32::default()),
+                bg: Color32::from_hex("#FFFFFF").unwrap_or(Color32::default()),
+                will_it_scroll: true,
+            }),
+            3 | 5 => Some(Scene {
+                contents: None,
+                name,
+                col: Color32::default(),
+                bg: Color32::default(),
+                will_it_scroll: false,
+            }),
+            _ => None,
+        }
+    }
+}
+pub fn preview_builder(map: Vec<(u8, String)>) -> Vec<Scene> {
+    let mut ans = vec![];
+    let mut map = map;
+    for i in 0..map.len() {
+        if map[i].0 == 9 {
+            for j in (0..i).rev() {
+                if matches!(map[j].0, 1 | 2 | 4) {
+                    map[j].1 = format!("{}\n{}", map[j].1, map[i].1);
+                    break;
+                }
+            }
+        }
+    }
+    for s in map {
+        if let Some(x) = Scene::from_map_slice(s) {
+            ans.push(x);
+        }
+    }
+    ans
 }
 pub fn get_config() -> Config {
     let config: Config = match std::fs::read_to_string("config.toml") {
@@ -283,7 +376,7 @@ pub fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u8, S
     }
     map
 }
-pub fn build_livestream(map: Vec<(u8, String)>) -> Main {
+pub fn build_livestream(mut map: Vec<(u8, String)>) -> Main {
     let name = match map.iter().find(|(k, _)| *k == 6).map(|(_, v)| v) {
         Some(x) => x.to_string(),
         None => map[0].1.clone(),
@@ -299,22 +392,35 @@ pub fn build_livestream(map: Vec<(u8, String)>) -> Main {
         4291523388,
         50,
         "center",
+        false,
     );
+    for i in 0..map.len() {
+        if map[i].0 == 9 {
+            for j in (0..i).rev() {
+                if matches!(map[j].0, 1 | 2 | 4) {
+                    map[j].1 = format!("{}\n{}", map[j].1, map[i].1);
+                    break;
+                }
+            }
+        }
+    }
     let mut index = 0;
     while index < map.len() {
         // 0 and 7 are skipped
         if map[index].0 == 2 {
+            let contents = &wrap_text(&map[index].1, 40);
             main.add_scene(&format!("scn_{}", map[index].1));
             main.add_text_obj(
                 &format!("txt_{}", map[index].1),
                 &format!("scn_{}", map[index].1),
-                &wrap_text(&map[index].1, 40),
+                contents,
                 50,
                 Position { x: 20.0, y: 20.0 },
                 4278190080,
                 4294967295,
                 75,
                 "left",
+                contents.lines().count() > 21,
             );
         } else if map[index].0 == 3 {
             main.add_scene(&format!("scn_{}", map[index].1));
@@ -327,51 +433,15 @@ pub fn build_livestream(map: Vec<(u8, String)>) -> Main {
             main.add_text_obj(
                 &format!("txt_{}", map[index].1),
                 &format!("scn_{}", map[index].1),
-                &wrap_text(&map[index].1, 100),
+                &wrap_text(&map[index].1, 75),
                 50,
                 Position { x: 0.0, y: 0.0 },
                 4278190080,
                 4294967295,
                 75,
                 "center",
+                false,
             );
-        } else if map[index].0 == 9 {
-            let mut temp_index = index - 1;
-            loop {
-                if map[temp_index].0 == 1 || map[temp_index].0 == 2 || map[temp_index].0 == 4 {
-                    if let Some(Source::Text { settings, .. }) = main.sources.iter_mut().find(|x| {
-                        if let Source::Text { name, .. } = x {
-                            name == &format!("txt_{}", map[temp_index].1)
-                        } else {
-                            false
-                        }
-                    }) {
-                        if map[temp_index].0 == 2 {
-                            settings.text =
-                                format!("{}\n{}", settings.text, wrap_text(&map[index].1, 40));
-                        } else {
-                            settings.text = format!("{}\n{}", settings.text, map[index].1);
-                        }
-                        break;
-                    }
-                } else if temp_index == 0 {
-                    main.add_scene(&format!("scn_{}", map[index].1));
-                    main.add_text_obj(
-                        &format!("txt_{}", map[index].1),
-                        &format!("scn_{}", map[index].1),
-                        &wrap_text(&map[index].1, 40),
-                        50,
-                        Position { x: 20.0, y: 20.0 },
-                        4278190080,
-                        4294967295,
-                        75,
-                        "left",
-                    );
-                    break;
-                } else {
-                    temp_index -= 1;
-                }
-            }
         }
         index += 1;
     }
