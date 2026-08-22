@@ -1,30 +1,11 @@
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
+use eframe::egui::Color32;
 use serde_derive::{Deserialize, Serialize};
 use std::fs;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use tauri_plugin_dialog::DialogExt;
-pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![
-            get_config,
-            get_help,
-            build_livestream,
-            bulletin_categorizer,
-            bulletin_reader,
-            save_obs_file
-        ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
-}
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 enum Source {
     Scene {
         name: String,
-        enabled: bool,
         id: String,
         settings: Items,
     },
@@ -32,6 +13,7 @@ enum Source {
         name: String,
         id: String,
         settings: TextSettings,
+        filters: Vec<ScrollFilter>,
     },
 }
 #[derive(Serialize, Deserialize)]
@@ -58,13 +40,37 @@ struct TextObj {
     scale_ref: Position,
     pos: Position,
 }
+#[derive(Serialize, Deserialize, Clone)]
+struct ScrollFilter {
+    name: String,
+    id: String,
+    settings: ScrollFilterSettings,
+}
+impl ScrollFilter {
+    fn from_speed(speed: f32) -> Self {
+        ScrollFilter {
+            name: "Scroll".to_string(),
+            id: "scroll_filter".to_string(),
+            settings: ScrollFilterSettings {
+                speed_y: speed,
+                looping: false,
+            },
+        }
+    }
+}
+#[derive(Serialize, Deserialize, Clone)]
+struct ScrollFilterSettings {
+    speed_y: f32,
+    #[serde(rename = "loop")]
+    looping: bool,
+}
 #[derive(Serialize, Deserialize, Clone, Copy)]
 struct Position {
     x: f32,
     y: f32,
 }
 #[derive(Serialize, Deserialize)]
-struct Main {
+pub struct Main {
     scene_order: Vec<Name>,
     current_scene: String,
     name: String,
@@ -88,7 +94,9 @@ impl Main {
             4281983947,
             4291523388,
             50,
-            "center",);
+            "center",
+            false,
+        );
         main
     }
     fn add_text_obj(
@@ -102,7 +110,12 @@ impl Main {
         bg_colour: u32,
         bg_opacity: u32,
         align: &str,
+        include_scroll: bool,
     ) {
+        let mut filters = vec![];
+        if include_scroll {
+            filters.push(ScrollFilter::from_speed(10.0)); // 10 is the right magic number for the fontsize :)
+        }
         self.sources.push(Source::Text {
             name: name.to_string(),
             id: "text_gdiplus".to_string(),
@@ -114,6 +127,7 @@ impl Main {
                 bk_color: bg_colour,
                 bk_opacity: bg_opacity,
             },
+            filters,
         });
         for source in self.sources.iter_mut() {
             if let Source::Scene {
@@ -142,7 +156,6 @@ impl Main {
         });
         self.sources.push(Source::Scene {
             name: name.to_string(),
-            enabled: true,
             id: "scene".to_string(),
             settings: Items {
                 items: vec![TextObj {
@@ -162,12 +175,72 @@ impl Main {
 struct Name {
     name: String,
 }
-#[derive(Deserialize, Serialize)]
-struct Config {
+#[derive(Deserialize, Serialize, Clone)]
+pub struct Config {
     cases: Vec<(u8, String)>,
 }
-#[tauri::command]
-fn get_config() -> Config {
+#[derive(Debug, PartialEq, Clone)]
+pub struct Scene {
+    pub contents: Option<String>,
+    pub name: String,
+    pub col: Color32,
+    pub bg: Color32,
+    pub will_it_scroll: bool,
+}
+impl Scene {
+    fn from_map_slice(slice: (u8, String)) -> Option<Scene> {
+        let mut p = 30;
+        if slice.1.len() < p {
+            p = slice.1.len()
+        }
+        let name: String = slice.1[..p].to_string();
+        match slice.0 {
+            1 | 4 | 8 => Some(Scene {
+                contents: Some(wrap_text(slice.1.as_str(), 75)),
+                name,
+                col: Color32::from_hex("#000000").unwrap_or(Color32::default()),
+                bg: Color32::from_hex("#FFFFFF").unwrap_or(Color32::default()),
+                will_it_scroll: false,
+            }),
+            2 => Some(Scene {
+                contents: Some(wrap_text(slice.1.as_str(), 40)),
+                name,
+                col: Color32::from_hex("#000000").unwrap_or(Color32::default()),
+                bg: Color32::from_hex("#FFFFFF").unwrap_or(Color32::default()),
+                will_it_scroll: true,
+            }),
+            3 | 5 => Some(Scene {
+                contents: None,
+                name,
+                col: Color32::default(),
+                bg: Color32::default(),
+                will_it_scroll: false,
+            }),
+            _ => None,
+        }
+    }
+}
+pub fn preview_builder(map: Vec<(u8, String)>) -> Vec<Scene> {
+    let mut ans = vec![];
+    let mut map = map;
+    for i in 0..map.len() {
+        if map[i].0 == 9 {
+            for j in (0..i).rev() {
+                if matches!(map[j].0, 1 | 2 | 4) {
+                    map[j].1 = format!("{}\n{}", map[j].1, map[i].1);
+                    break;
+                }
+            }
+        }
+    }
+    for s in map {
+        if let Some(x) = Scene::from_map_slice(s) {
+            ans.push(x);
+        }
+    }
+    ans
+}
+pub fn get_config() -> Config {
     let config: Config = match std::fs::read_to_string("config.toml") {
         Ok(s) => toml::from_str::<Config>(&s).unwrap_or(Config { cases: vec![] }),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
@@ -178,30 +251,14 @@ fn get_config() -> Config {
     };
     config
 }
-use std::sync::mpsc;
-#[tauri::command]
-async fn bulletin_reader(app: tauri::AppHandle) -> Result<Vec<String>, u8> {
-    let (tx, rx) = mpsc::channel();
-    app.dialog().file().pick_file(move |file_path| {
-        let _ = tx.send(file_path.map(|p| p.to_string()));
-    });
-    let file_path = rx.recv().map_err(|_| 0u8)?;
-    let file_path = file_path.ok_or(0u8)?;
-    let f = File::open(&file_path).map_err(|_| 1u8)?;
-    let reader = BufReader::new(f);
-    let mut lines = vec![];
-    for line in reader.lines() {
-        lines.push(line.map_err(|_| 2u8)?);
+pub fn get_help() {
+    if let Err(e) =
+        open::that("https://github.com/TheOrangeTiger/OBS_Church_Automation/blob/main/README.md")
+    {
+        eprintln!("Failed to open help link: {e}");
     }
-    Ok(lines)
 }
-#[tauri::command]
-fn get_help() {
-    let _ =
-        open::that("https://github.com/TheOrangeTiger/OBS_Church_Automation/blob/main/README.md");
-}
-#[tauri::command]
-fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u8, String)> {
+pub fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u8, String)> {
     let cases = config.cases;
     let mut map: Vec<(u8, String)> = vec![];
     let mut bulliten_index = 1;
@@ -319,8 +376,7 @@ fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u8, Strin
     }
     map
 }
-#[tauri::command]
-fn build_livestream(map: Vec<(u8, String)>) -> Main {
+pub fn build_livestream(mut map: Vec<(u8, String)>) -> Main {
     let name = match map.iter().find(|(k, _)| *k == 6).map(|(_, v)| v) {
         Some(x) => x.to_string(),
         None => map[0].1.clone(),
@@ -336,22 +392,35 @@ fn build_livestream(map: Vec<(u8, String)>) -> Main {
         4291523388,
         50,
         "center",
+        false,
     );
+    for i in 0..map.len() {
+        if map[i].0 == 9 {
+            for j in (0..i).rev() {
+                if matches!(map[j].0, 1 | 2 | 4) {
+                    map[j].1 = format!("{}\n{}", map[j].1, map[i].1);
+                    break;
+                }
+            }
+        }
+    }
     let mut index = 0;
     while index < map.len() {
         // 0 and 7 are skipped
         if map[index].0 == 2 {
+            let contents = &wrap_text(&map[index].1, 40);
             main.add_scene(&format!("scn_{}", map[index].1));
             main.add_text_obj(
                 &format!("txt_{}", map[index].1),
                 &format!("scn_{}", map[index].1),
-                &wrap_text(&map[index].1, 40),
+                contents,
                 50,
                 Position { x: 20.0, y: 20.0 },
                 4278190080,
                 4294967295,
                 75,
                 "left",
+                contents.lines().count() > 21,
             );
         } else if map[index].0 == 3 {
             main.add_scene(&format!("scn_{}", map[index].1));
@@ -364,51 +433,15 @@ fn build_livestream(map: Vec<(u8, String)>) -> Main {
             main.add_text_obj(
                 &format!("txt_{}", map[index].1),
                 &format!("scn_{}", map[index].1),
-                &wrap_text(&map[index].1, 100),
+                &wrap_text(&map[index].1, 75),
                 50,
                 Position { x: 0.0, y: 0.0 },
                 4278190080,
                 4294967295,
                 75,
                 "center",
+                false,
             );
-        } else if map[index].0 == 9 {
-            let mut temp_index = index - 1;
-            loop {
-                if map[temp_index].0 == 1 || map[temp_index].0 == 2 || map[temp_index].0 == 4 {
-                    if let Some(Source::Text { settings, .. }) = main.sources.iter_mut().find(|x| {
-                        if let Source::Text { name, .. } = x {
-                            name == &format!("txt_{}", map[temp_index].1)
-                        } else {
-                            false
-                        }
-                    }) {
-                        if map[temp_index].0 == 2 {
-                            settings.text =
-                                format!("{}\n{}", settings.text, wrap_text(&map[index].1, 40));
-                        } else {
-                            settings.text = format!("{}\n{}", settings.text, map[index].1);
-                        }
-                        break;
-                    }
-                } else if temp_index == 0 {
-                    main.add_scene(&format!("scn_{}", map[index].1));
-                    main.add_text_obj(
-                        &format!("txt_{}", map[index].1),
-                        &format!("scn_{}", map[index].1),
-                        &wrap_text(&map[index].1, 40),
-                        50,
-                        Position { x: 20.0, y: 20.0 },
-                        4278190080,
-                        4294967295,
-                        75,
-                        "left",
-                    );
-                    break;
-                } else {
-                    temp_index -= 1;
-                }
-            }
         }
         index += 1;
     }
@@ -425,7 +458,7 @@ fn wrap_text(text: &str, width: usize) -> String {
         .collect::<Vec<String>>()
         .join("\n")
 }
-fn wrap_line(text: &str, width: usize) -> String {
+pub fn wrap_line(text: &str, width: usize) -> String {
     let mut result = String::new();
     let mut line_len = 0;
     for word in text.split_whitespace() {
@@ -441,141 +474,9 @@ fn wrap_line(text: &str, width: usize) -> String {
     }
     result
 }
-#[tauri::command]
-fn save_obs_file(main: Main) {
+pub fn save_obs_file(main: Main) {
     let _ = fs::write(
         format!("{}.json", main.name),
         serde_json::to_string_pretty(&main).unwrap_or("Failed to save JSON".to_string()),
     );
-}
-use figlet_rs::FIGlet;
-use owo_colors::OwoColorize;
-// Yellow bold w \t for main messages
-// Blue for choices
-// Red bold for errors or unexpected occuences
-use std::fs::read_to_string;
-use std::io;
-pub fn cli() {
-    let font = FIGlet::standard().unwrap();
-    println!(
-        "{}{}{}{}",
-        font.convert("OBS").unwrap().yellow().bold(),
-        font.convert("Church").unwrap().yellow().bold(),
-        font.convert("Automation").unwrap().yellow().bold(),
-        font.convert(": ]").unwrap().yellow().bold()
-    );
-    'big_loop: loop {
-        println!(
-            "{}\n{}\n{}\n{}\n{}",
-            "\tWould you like to:".yellow().bold(),
-            "(1) Generate a json based on a txt file".blue(),
-            "(2) Edit an existing json".blue(),
-            "(3) Exit the program".blue(),
-            "(4) Open documentation".blue()
-        );
-        let input = grab_input(Some(vec!["1", "2", "3", "4"]));
-        match input.as_str() {
-            "1" => {
-                let txt = loop {
-                    println!("{}", "\tPlease enter the path to the txt".yellow().bold());
-                    let path = grab_input(None);
-                    if !path.ends_with(".txt") {
-                        println!("{}", "Must be a txt file".red().bold());
-                        continue;
-                    }
-                    let txt = read_to_string(&path);
-                    let Ok(s) = txt else {
-                        println!("{}{}", "Err: ".red().bold(), txt.unwrap_err().red().bold());
-                        continue;
-                    };
-                    break s.trim().to_string();
-                };
-                let mut line: usize = 0;
-                let mut sifted = bulletin_categorizer(
-                    txt.lines().map(|x| x.to_string()).collect(),
-                    get_config(),
-                );
-                loop {
-                    println!(
-                        "{}{}",
-                        "\tActions:\n".yellow().bold(),
-                        "(0) = unidentified\n(1) = credits\n(2) = regular text\n(3) = hymn\n(4) = P: C:\n(5) = insert empty scene\n(6) = service name\n(7) = N/A\n(8) = special music\n(9) = with previous\n(w) = write and exit\n() = do nothing\n(b) = go back".blue()
-                    );
-                    println!(
-                        "{}{}",
-                        sifted[line].0.bright_green(),
-                        "\tLine:".yellow().bold()
-                    );
-                    println!("{}", wrap_line(&sifted[line].1, 75).green());
-                    let action = grab_input(Some(vec![
-                        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "w", "", "b",
-                    ]));
-                    if action.as_str() == "w" {
-                        break;
-                    } else if action.is_empty() {
-                        if line <= sifted.len() {
-                            line += 1;
-                        }
-                        continue;
-                    } else if action.as_str() == "b" {
-                        if line != 0 {
-                            line -= 1;
-                        }
-                        continue;
-                    }
-                    sifted[line].0 = action.parse().unwrap_or(0);
-                }
-                save_obs_file(build_livestream(sifted));
-            }
-            "2" => {
-                println!("{}", "Editing json not yet supported".red().bold());
-                continue;
-                loop {
-                    println!("{}", "\tPlease enter the path to the json".yellow().bold());
-                    let path = grab_input(None);
-                    if !path.ends_with(".json") {
-                        println!("{}", "Must be a json file".red().bold());
-                        continue;
-                    }
-                    let txt = read_to_string(&path);
-                    let Ok(s) = txt else {
-                        println!("{}{}", "Err: ".red().bold(), txt.unwrap_err().red().bold());
-                        continue;
-                    };
-                    break;
-                }
-            }
-            "3" => {
-                break 'big_loop;
-            }
-            "4" => {
-                get_help();
-            }
-            _ => unreachable!(),
-        }
-    }
-}
-fn grab_input(allowable_cases: Option<Vec<&str>>) -> String {
-    loop {
-        let mut input = String::new();
-        match io::stdin().read_line(&mut input) {
-            Ok(_) => {
-                if let Some(c) = &allowable_cases {
-                    if !c.contains(&&input.trim().to_lowercase().as_str()) {
-                        println!("{}", "Please provide a valid input".red().bold());
-                        continue;
-                    }
-                }
-            }
-            Err(e) => {
-                println!(
-                    "{}{e}{}",
-                    "Encountered error: ".red().bold(),
-                    "\nPlease try again".red().bold()
-                );
-                continue;
-            }
-        }
-        return input.trim().to_string();
-    }
 }

@@ -47,12 +47,12 @@ Then in OBS import the JSON that was outputed by the program
 |Number|Use Case|Explanation|
 |-----:|:-------|:----------|
 |0|For text you don't want in OBS|When constructing the JSON, text selected with 0 is skipped|
-|1|For the credits|This text is wrapped to 100 characters and is inserted at the bottom left of the screen|
+|1|For the credits|This text is wrapped to 75 characters and is inserted at the top left of the screen|
 |2|For readings|This text is wrapped to 40 characters and is inserted at the top left of the screen|
 |3|For hymns|An empty scene is inserted into OBS, to add a hymn image, add an image source and select the desired hymn|
-|4|For call and response (P: C:)|This text is wrapped to 100 characters and is inserted at the bottom left of the screen|
+|4|For call and response (P: C:)|This text is wrapped to 75 characters and is inserted at the top left of the screen|
 |5|For empty scenes|Adds an empty scene, subsequent scenes are merged into the last one selected with 5|
 |6|The name of the service|The first text selected with 6 is chosen as the name of the service. This affects the name of the JSON file, the name of the scene collection in OBS and the text in the intro slide|
 |7|For text you don't want in OBS|Similarly to 0, the text is not added to OBS|
-|8|For special music|This text is wrapped to 100 characters and is inserted at the bottom left of the screen|
+|8|For special music|This text is wrapped to 75 characters and is inserted at the top left of the screen|
 |9|To add text to the previous paragraph|This will add the selected text to the paragraph selected with 1, 2 or 4 that is the closest to it going up|

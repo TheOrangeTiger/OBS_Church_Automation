@@ -1,0 +1,217 @@
+{
+  "scene_order": [
+    {
+      "name": "Camera"
+    },
+    {
+      "name": "Intro Slide"
+    },
+    {
+      "name": "scn_Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec blandit mauris nec arcu feugiat vestibulum. Suspendisse dictum ipsum felis, nec sagittis diam tristique semper. Phasellus convallis laoreet est vel tempus. Nam pretium, elit in laoreet placerat, est elit cursus turpis, in vulputate justo lectus sit amet sem. Proin quis consequat erat. Morbi volutpat convallis justo, at dapibus sem tempor non. Donec gravida est a porttitor malesuada. Sed laoreet congue purus ut bibendum. Aliquam feugiat leo sed est vulputate luctus.\nQuisque auctor ornare tortor, ut aliquet felis viverra ut. Nunc nunc ex, rutrum non ipsum et, viverra ullamcorper odio. Mauris tincidunt neque vel nisl varius, vulputate tempor turpis cursus. Aenean ut sodales nisi. Donec ac mauris massa. Interdum et malesuada fames ac ante ipsum primis in faucibus. Proin egestas ornare odio non molestie. Nulla consectetur nulla ut est varius, sit amet tristique sapien convallis. Sed viverra sapien at volutpat iaculis. Mauris hendrerit lorem ac tortor ullamcorper rhoncus. Proin leo massa, lobortis id feugiat vitae, auctor vel nisl. Praesent quis dignissim enim."
+    },
+    {
+      "name": "scn_Sed elementum velit quis tincidunt imperdiet. Sed molestie sollicitudin laoreet. Morbi molestie sem lectus, nec dapibus velit tempus quis. Praesent eu nisl id neque suscipit lacinia. In aliquet faucibus lobortis."
+    }
+  ],
+  "current_scene": "Camera",
+  "name": "asd",
+  "sources": [
+    {
+      "name": "Camera",
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Intro Slide",
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "License",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 25.0,
+              "y": 934.0
+            }
+          },
+          {
+            "name": "Service Name",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 75.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "License",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Music and Images: OneLicense A - 730010 \nCCLI #3385233\n© Trinity Lutheran Church 2025",
+        "align": "center",
+        "color": 4281983947,
+        "bk_color": 4291523388,
+        "bk_opacity": 50,
+        "font": {
+          "size": 40
+        }
+      },
+      "filters": []
+    },
+    {
+      "name": "Service Name",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " asd \n Trinity Lutheran Church - Edmonton ",
+        "align": "center",
+        "color": 4281983947,
+        "bk_color": 4291523388,
+        "bk_opacity": 50,
+        "font": {
+          "size": 55
+        }
+      },
+      "filters": []
+    },
+    {
+      "name": "scn_Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec blandit mauris nec arcu feugiat vestibulum. Suspendisse dictum ipsum felis, nec sagittis diam tristique semper. Phasellus convallis laoreet est vel tempus. Nam pretium, elit in laoreet placerat, est elit cursus turpis, in vulputate justo lectus sit amet sem. Proin quis consequat erat. Morbi volutpat convallis justo, at dapibus sem tempor non. Donec gravida est a porttitor malesuada. Sed laoreet congue purus ut bibendum. Aliquam feugiat leo sed est vulputate luctus.\nQuisque auctor ornare tortor, ut aliquet felis viverra ut. Nunc nunc ex, rutrum non ipsum et, viverra ullamcorper odio. Mauris tincidunt neque vel nisl varius, vulputate tempor turpis cursus. Aenean ut sodales nisi. Donec ac mauris massa. Interdum et malesuada fames ac ante ipsum primis in faucibus. Proin egestas ornare odio non molestie. Nulla consectetur nulla ut est varius, sit amet tristique sapien convallis. Sed viverra sapien at volutpat iaculis. Mauris hendrerit lorem ac tortor ullamcorper rhoncus. Proin leo massa, lobortis id feugiat vitae, auctor vel nisl. Praesent quis dignissim enim.",
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "txt_Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec blandit mauris nec arcu feugiat vestibulum. Suspendisse dictum ipsum felis, nec sagittis diam tristique semper. Phasellus convallis laoreet est vel tempus. Nam pretium, elit in laoreet placerat, est elit cursus turpis, in vulputate justo lectus sit amet sem. Proin quis consequat erat. Morbi volutpat convallis justo, at dapibus sem tempor non. Donec gravida est a porttitor malesuada. Sed laoreet congue purus ut bibendum. Aliquam feugiat leo sed est vulputate luctus.\nQuisque auctor ornare tortor, ut aliquet felis viverra ut. Nunc nunc ex, rutrum non ipsum et, viverra ullamcorper odio. Mauris tincidunt neque vel nisl varius, vulputate tempor turpis cursus. Aenean ut sodales nisi. Donec ac mauris massa. Interdum et malesuada fames ac ante ipsum primis in faucibus. Proin egestas ornare odio non molestie. Nulla consectetur nulla ut est varius, sit amet tristique sapien convallis. Sed viverra sapien at volutpat iaculis. Mauris hendrerit lorem ac tortor ullamcorper rhoncus. Proin leo massa, lobortis id feugiat vitae, auctor vel nisl. Praesent quis dignissim enim.",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 20.0,
+              "y": 20.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "txt_Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec blandit mauris nec arcu feugiat vestibulum. Suspendisse dictum ipsum felis, nec sagittis diam tristique semper. Phasellus convallis laoreet est vel tempus. Nam pretium, elit in laoreet placerat, est elit cursus turpis, in vulputate justo lectus sit amet sem. Proin quis consequat erat. Morbi volutpat convallis justo, at dapibus sem tempor non. Donec gravida est a porttitor malesuada. Sed laoreet congue purus ut bibendum. Aliquam feugiat leo sed est vulputate luctus.\nQuisque auctor ornare tortor, ut aliquet felis viverra ut. Nunc nunc ex, rutrum non ipsum et, viverra ullamcorper odio. Mauris tincidunt neque vel nisl varius, vulputate tempor turpis cursus. Aenean ut sodales nisi. Donec ac mauris massa. Interdum et malesuada fames ac ante ipsum primis in faucibus. Proin egestas ornare odio non molestie. Nulla consectetur nulla ut est varius, sit amet tristique sapien convallis. Sed viverra sapien at volutpat iaculis. Mauris hendrerit lorem ac tortor ullamcorper rhoncus. Proin leo massa, lobortis id feugiat vitae, auctor vel nisl. Praesent quis dignissim enim.",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Lorem ipsum dolor sit amet, consectetur \n adipiscing elit. Donec blandit mauris nec \n arcu feugiat vestibulum. Suspendisse \n dictum ipsum felis, nec sagittis diam \n tristique semper. Phasellus convallis \n laoreet est vel tempus. Nam pretium, elit \n in laoreet placerat, est elit cursus \n turpis, in vulputate justo lectus sit \n amet sem. Proin quis consequat erat. \n Morbi volutpat convallis justo, at \n dapibus sem tempor non. Donec gravida est \n a porttitor malesuada. Sed laoreet congue \n purus ut bibendum. Aliquam feugiat leo \n sed est vulputate luctus. \n Quisque auctor ornare tortor, ut aliquet \n felis viverra ut. Nunc nunc ex, rutrum \n non ipsum et, viverra ullamcorper odio. \n Mauris tincidunt neque vel nisl varius, \n vulputate tempor turpis cursus. Aenean ut \n sodales nisi. Donec ac mauris massa. \n Interdum et malesuada fames ac ante ipsum \n primis in faucibus. Proin egestas ornare \n odio non molestie. Nulla consectetur \n nulla ut est varius, sit amet tristique \n sapien convallis. Sed viverra sapien at \n volutpat iaculis. Mauris hendrerit lorem \n ac tortor ullamcorper rhoncus. Proin leo \n massa, lobortis id feugiat vitae, auctor \n vel nisl. Praesent quis dignissim enim. ",
+        "align": "left",
+        "color": 4278190080,
+        "bk_color": 4294967295,
+        "bk_opacity": 75,
+        "font": {
+          "size": 50
+        }
+      },
+      "filters": [
+        {
+          "name": "Scroll",
+          "id": "scroll_filter",
+          "settings": {
+            "speed_y": 10.0,
+            "loop": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "scn_Sed elementum velit quis tincidunt imperdiet. Sed molestie sollicitudin laoreet. Morbi molestie sem lectus, nec dapibus velit tempus quis. Praesent eu nisl id neque suscipit lacinia. In aliquet faucibus lobortis.",
+      "id": "scene",
+      "settings": {
+        "items": [
+          {
+            "name": "Camera",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          {
+            "name": "txt_Sed elementum velit quis tincidunt imperdiet. Sed molestie sollicitudin laoreet. Morbi molestie sem lectus, nec dapibus velit tempus quis. Praesent eu nisl id neque suscipit lacinia. In aliquet faucibus lobortis.",
+            "visible": true,
+            "scale_ref": {
+              "x": 1920.0,
+              "y": 1080.0
+            },
+            "pos": {
+              "x": 20.0,
+              "y": 20.0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "txt_Sed elementum velit quis tincidunt imperdiet. Sed molestie sollicitudin laoreet. Morbi molestie sem lectus, nec dapibus velit tempus quis. Praesent eu nisl id neque suscipit lacinia. In aliquet faucibus lobortis.",
+      "id": "text_gdiplus",
+      "settings": {
+        "text": " Sed elementum velit quis tincidunt \n imperdiet. Sed molestie sollicitudin \n laoreet. Morbi molestie sem lectus, nec \n dapibus velit tempus quis. Praesent eu \n nisl id neque suscipit lacinia. In \n aliquet faucibus lobortis. ",
+        "align": "left",
+        "color": 4278190080,
+        "bk_color": 4294967295,
+        "bk_opacity": 75,
+        "font": {
+          "size": 50
+        }
+      },
+      "filters": []
+    }
+  ]
+}

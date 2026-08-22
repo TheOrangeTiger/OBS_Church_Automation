@@ -1,17 +1,6 @@
-# NUMBER MEANINGS
-# 0 = unidentified
-# 1 = credits
-# 2 = regular text
-# 3 = hymn
-# 4 = P: C:
-# 5 = insert empty scene
-# 6 = service name
-# 7 = lords prayer
-# 8 = special music
-# FORMAT
-# case = number
 cases = [
     [10, "Acknowledgment of the Land"],
+    [10, "Land Acknowledgment"],
     [3, "#"],
     [3, "Choir:"],
     [5, "Announcements"],
@@ -20,6 +9,7 @@ cases = [
     [5, "Sharing of the Peace"],
     [2, "Dismissal"],
     [2, "Confession & Forgiveness"],
+    [8, "Special Music"],
     [9, "P:"],
     [9, "C:"],
     [9, "R:"],
