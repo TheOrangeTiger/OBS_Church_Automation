@@ -8,7 +8,7 @@
 
 Upon launching the program, you will be met with this screen:
 
-<img width="1920" height="1051" alt="image" src="https://github.com/user-attachments/assets/754f7ab5-67a1-40f8-b609-367154096bf4" />
+<img width="624" height="263" alt="image" src="https://github.com/user-attachments/assets/0c39d5ab-19ba-49cb-a905-2e9674e70ce3" />
 
 To begin, copy and paste the contents of a bulletin to a TXT file, then select that file with the "Choose File" button
 
