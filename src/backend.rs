@@ -244,7 +244,7 @@ pub fn get_config() -> Config {
     let config: Config = match std::fs::read_to_string("config.toml") {
         Ok(s) => toml::from_str::<Config>(&s).unwrap_or(Config { cases: vec![] }),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            let _ = fs::write("config.toml", "# NUMBER MEANINGS\n# 0 = unidentified\n# 1 = credits\n# 2 = readings\n# 3 = hymn\n# 4 = P: C:\n# 5 = insert empty scene\n# 6 = service name\n# 7 = N/A\n# 8 = special music\n# 9 = with previous\n# 10 = this line 2 next line 9\n# FORMAT\ncases = [\n\t[2, \"hello\"],\n]\ncases = []");
+            let _ = fs::write("config.toml", "# NUMBER MEANINGS\n# 0 = unidentified\n# 1 = credits\n# 2 = readings\n# 3 = hymn\n# 4 = P: C:\n# 5 = insert empty scene\n# 6 = service name\n# 7 = N/A\n# 8 = special music\n# 9 = with previous\n# 10 = this line 2 next line 9\n# FORMAT\n# cases = [\n#\t[2, \"hello\"],\n#]\ncases = []");
             Config { cases: vec![] }
         }
         Err(_) => Config { cases: vec![] },
@@ -266,7 +266,10 @@ pub fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u8, S
     while bulliten_index < bulliten.len() {
         let line = bulliten[bulliten_index].trim().to_string();
         if line.is_empty() {
-        } else if line.contains("Lord’s Prayer") {
+        } else if line.contains("Lord’s Prayer")
+            || line.contains("Lord's Prayer")
+            || line.contains("Lords Prayer")
+        {
             map.push((2, line));
             map.push((
                 9,
@@ -287,7 +290,7 @@ pub fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u8, S
                 Amen."
                     .to_string(),
             ));
-        } else if line.contains("Apostles’ Creed") {
+        } else if line.contains("Apostles’ Creed") || line.contains("Apostles Creed") {
             map.push((2, line));
             map.push((
                 9,

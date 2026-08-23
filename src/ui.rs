@@ -21,15 +21,34 @@ const NUMBER_MEANING: [&str; 10] = [
     "9 - Add to Previous",
 ];
 
+#[derive(PartialEq)]
+enum UiState {
+    Preview,
+    Main,
+    Edit,
+}
+
+impl UiState {
+    fn get_state_string(&self) -> String {
+        match self {
+            UiState::Edit => "Edit Mode".to_string(),
+            UiState::Preview => "Preview Mode".to_string(),
+            UiState::Main => "Main Mode".to_string(),
+        }
+    }
+}
+
 struct Ui {
     config: Config,
     data: Option<Vec<(u8, String, bool)>>,
-    in_preview_mode: bool,
+    state: UiState,
     paragraph_value: u8,
     slide: usize,
     scenes: Vec<Scene>,
     compute_scenes: bool,
     file_save_text: Option<std::time::Instant>,
+    editing_paragraph: Option<(String, usize)>,
+    make_data_2_false: bool,
 }
 
 impl Ui {
@@ -51,32 +70,55 @@ impl Ui {
         Ui {
             config: get_config(),
             data: None,
-            in_preview_mode: false,
+            state: UiState::Main,
             paragraph_value: 0,
             slide: 0,
             scenes: vec![],
             compute_scenes: false,
             file_save_text: None,
+            editing_paragraph: None,
+            make_data_2_false: false,
         }
     }
 }
 
 impl eframe::App for Ui {
-    fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         ui.add_space(16.0);
         ui.horizontal(|ui| {
             ui.add_space(16.0);
             ui.heading(RichText::new("OBS Church Automator").size(24.0));
-            ui.checkbox(
-                &mut self.in_preview_mode,
-                RichText::new("Preview Mode").size(16.0),
-            );
+            ui.push_id("State Box", |ui| {
+                egui::ComboBox::from_label("")
+                    .selected_text(RichText::new(self.state.get_state_string()).size(16.0))
+                    .height(f32::INFINITY)
+                    .show_ui(ui, |ui| {
+                        ui.selectable_value(
+                            &mut self.state,
+                            UiState::Main,
+                            RichText::new(UiState::Main.get_state_string()).size(16.0),
+                        );
+                        ui.selectable_value(
+                            &mut self.state,
+                            UiState::Preview,
+                            RichText::new(UiState::Preview.get_state_string()).size(16.0),
+                        );
+                        ui.selectable_value(
+                            &mut self.state,
+                            UiState::Edit,
+                            RichText::new(UiState::Edit.get_state_string()).size(16.0),
+                        );
+                    });
+            });
             if ui.button(RichText::new("Help").size(16.0)).clicked() {
                 get_help();
             }
         });
-        match self.in_preview_mode {
-            false => {
+        match self.state {
+            UiState::Main => {
+                if !self.make_data_2_false {
+                    self.make_data_2_false = true;
+                }
                 ui.horizontal(|ui| {
                     ui.add_space(16.0);
                     if ui.button(RichText::new("Load File").size(16.0)).clicked() {
@@ -142,7 +184,7 @@ impl eframe::App for Ui {
                             }
                         });
                     if self.file_save_text > Some(std::time::Instant::now()) {
-                        ui.label("File Saved!!");
+                        ui.label(RichText::new("File Saved!!").color(Color32::ORANGE));
                         ui.ctx().request_repaint();
                     } else if self.file_save_text != None {
                         self.file_save_text = None;
@@ -158,7 +200,7 @@ impl eframe::App for Ui {
                     });
                 }
             }
-            true => {
+            UiState::Preview => {
                 if self.compute_scenes {
                     self.compute_scenes = false;
                     self.scenes = preview_builder(
@@ -215,6 +257,32 @@ impl eframe::App for Ui {
                     });
                 }
             }
+            UiState::Edit => match &self.editing_paragraph {
+                Some((s, i)) => {}
+                _ => match &mut self.data {
+                    Some(data) => {
+                        if self.make_data_2_false {
+                            for d in data.iter_mut() {
+                                d = (d.0, d.1, false);
+                            }
+                            self.make_data_2_false = false;
+                        }
+                        for (i, (_, s, b)) in data.iter().enumerate() {
+                            if b == &true {
+                                self.editing_paragraph = Some((s.clone(), i));
+                            }
+                        }
+                        egui::ScrollArea::vertical().show(ui, |ui| {
+                            for i in 0..data.len() {
+                                ui.horizontal(|ui| {
+                                    display_row(data, ui, i);
+                                });
+                            }
+                        });
+                    }
+                    _ => (),
+                },
+            },
         }
     }
 }
