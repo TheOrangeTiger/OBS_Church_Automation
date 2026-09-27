@@ -25,15 +25,17 @@ const NUMBER_MEANING: [&str; 10] = [
 enum UiState {
     Preview,
     Main,
-    Edit,
+    Paste,
+    // Edit,
 }
 
 impl UiState {
     fn get_state_string(&self) -> String {
         match self {
-            UiState::Edit => "Edit Mode".to_string(),
+            // UiState::Edit => "Edit Mode".to_string(),
             UiState::Preview => "Preview Mode".to_string(),
             UiState::Main => "Main Mode".to_string(),
+            UiState::Paste => "Paste Bulletin".to_string(),
         }
     }
 }
@@ -47,8 +49,10 @@ struct Ui {
     scenes: Vec<Scene>,
     compute_scenes: bool,
     file_save_text: Option<std::time::Instant>,
-    editing_paragraph: Option<(String, usize)>,
+    // editing_paragraph: Option<(String, usize)>,
     make_data_2_false: bool,
+    pasted_contents: String,
+    pasted_import_completed: Option<std::time::Instant>,
 }
 
 impl Ui {
@@ -76,8 +80,10 @@ impl Ui {
             scenes: vec![],
             compute_scenes: false,
             file_save_text: None,
-            editing_paragraph: None,
+            // editing_paragraph: None,
             make_data_2_false: false,
+            pasted_contents: "".to_string(),
+            pasted_import_completed: None,
         }
     }
 }
@@ -105,9 +111,14 @@ impl eframe::App for Ui {
                         );
                         ui.selectable_value(
                             &mut self.state,
-                            UiState::Edit,
-                            RichText::new(UiState::Edit.get_state_string()).size(16.0),
+                            UiState::Paste,
+                            RichText::new(UiState::Paste.get_state_string()).size(16.0),
                         );
+                        // ui.selectable_value(
+                        //     &mut self.state,
+                        //     UiState::Edit,
+                        //     RichText::new(UiState::Edit.get_state_string()).size(16.0),
+                        // );
                     });
             });
             if ui.button(RichText::new("Help").size(16.0)).clicked() {
@@ -115,6 +126,54 @@ impl eframe::App for Ui {
             }
         });
         match self.state {
+            UiState::Paste => {
+                ui.horizontal(|ui| {
+                    ui.add_space(16.0);
+                    if ui
+                        .button(RichText::new("Clear Contents").size(16.0))
+                        .clicked()
+                    {
+                        self.pasted_contents = "".to_string()
+                    }
+                    if ui
+                        .button(RichText::new("Load File Into Main").size(16.0))
+                        .clicked()
+                        && &self.pasted_contents != ""
+                    {
+                        self.data = Some(
+                            bulletin_categorizer(
+                                self.pasted_contents
+                                    .split("\n")
+                                    .map(|x| x.to_string())
+                                    .collect(),
+                                self.config.clone(),
+                            )
+                            .into_iter()
+                            .map(|(k, v)| (k, v, false))
+                            .collect(),
+                        );
+                        self.pasted_import_completed =
+                            Some(std::time::Instant::now() + std::time::Duration::from_secs(3));
+                    }
+                    if self.pasted_import_completed > Some(std::time::Instant::now()) {
+                        ui.label(RichText::new("File Imported to Main!!").color(Color32::ORANGE));
+                        ui.ctx().request_repaint();
+                    } else if self.pasted_import_completed != None {
+                        self.pasted_import_completed = None;
+                    }
+                });
+                let height = ui.available_height();
+                egui::ScrollArea::vertical()
+                    .auto_shrink([false, false])
+                    .show(ui, |ui| {
+                        ui.add(
+                            egui::TextEdit::multiline(&mut self.pasted_contents)
+                                .font(egui::FontId::monospace(16.0))
+                                .desired_width(f32::INFINITY)
+                                .min_size(egui::vec2(0.0, height)),
+                        );
+                    });
+            }
             UiState::Main => {
                 if !self.make_data_2_false {
                     self.make_data_2_false = true;
@@ -256,33 +315,32 @@ impl eframe::App for Ui {
                         );
                     });
                 }
-            }
-            UiState::Edit => match &self.editing_paragraph {
-                Some((s, i)) => {}
-                _ => match &mut self.data {
-                    Some(data) => {
-                        if self.make_data_2_false {
-                            for d in data.iter_mut() {
-                                d = (d.0, d.1, false);
-                            }
-                            self.make_data_2_false = false;
-                        }
-                        for (i, (_, s, b)) in data.iter().enumerate() {
-                            if b == &true {
-                                self.editing_paragraph = Some((s.clone(), i));
-                            }
-                        }
-                        egui::ScrollArea::vertical().show(ui, |ui| {
-                            for i in 0..data.len() {
-                                ui.horizontal(|ui| {
-                                    display_row(data, ui, i);
-                                });
-                            }
-                        });
-                    }
-                    _ => (),
-                },
-            },
+            } //     UiState::Edit => match &self.editing_paragraph {
+              //         Some((s, i)) => {}
+              //         _ => match &mut self.data {
+              //             Some(data) => {
+              //                 if self.make_data_2_false {
+              //                     for d in data.iter_mut() {
+              //                         d = (d.0, d.1, false);
+              //                     }
+              //                     self.make_data_2_false = false;
+              //                 }
+              //                 for (i, (_, s, b)) in data.iter().enumerate() {
+              //                     if b == &true {
+              //                         self.editing_paragraph = Some((s.clone(), i));
+              //                     }
+              //                 }
+              //                 egui::ScrollArea::vertical().show(ui, |ui| {
+              //                     for i in 0..data.len() {
+              //                         ui.horizontal(|ui| {
+              //                             display_row(data, ui, i);
+              //                         });
+              //                     }
+              //                 });
+              //             }
+              //             _ => (),
+              //         },
+              //     },
         }
     }
 }
@@ -369,6 +427,9 @@ pub fn ui() -> eframe::Result<()> {
     eframe::run_native(
         "OBS Church Automator",
         eframe::NativeOptions::default(),
-        Box::new(|cc| Ok(Box::new(Ui::new(cc)))),
+        Box::new(|cc| {
+            cc.egui_ctx.set_theme(egui::Theme::Dark);
+            Ok(Box::new(Ui::new(cc)))
+        }),
     )
 }

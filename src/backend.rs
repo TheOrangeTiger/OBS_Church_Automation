@@ -114,7 +114,7 @@ impl Main {
     ) {
         let mut filters = vec![];
         if include_scroll {
-            filters.push(ScrollFilter::from_speed(10.0)); // 10 is the right magic number for the fontsize :)
+            filters.push(ScrollFilter::from_speed(12.0)); // 12 is the right magic number for the fontsize :)
         }
         self.sources.push(Source::Text {
             name: name.to_string(),
@@ -290,7 +290,10 @@ pub fn bulletin_categorizer(bulliten: Vec<String>, config: Config) -> Vec<(u8, S
                 Amen."
                     .to_string(),
             ));
-        } else if line.contains("Apostles’ Creed") || line.contains("Apostles Creed") {
+        } else if line.contains("Apostles’ Creed")
+            || line.contains("Apostles Creed")
+            || line.contains("Apostle’s Creed")
+        {
             map.push((2, line));
             map.push((
                 9,
