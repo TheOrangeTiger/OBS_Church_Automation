@@ -3,9 +3,10 @@ use crate::backend::{
     Config, Scene,
 };
 use eframe::egui::{self, Color32, RichText, Vec2};
+use serde_derive::{Deserialize, Serialize};
 use std::{
     fs::File,
-    io::{BufRead, BufReader},
+    io::{read_to_string, BufRead, BufReader, Read, Write},
 };
 
 const NUMBER_MEANING: [&str; 10] = [
@@ -21,7 +22,7 @@ const NUMBER_MEANING: [&str; 10] = [
     "9 - Add to Previous",
 ];
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Serialize, Deserialize)]
 enum UiState {
     Preview,
     Main,
@@ -40,6 +41,11 @@ impl UiState {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+struct UiSave {
+    data: Option<Vec<(u8, String, bool)>>,
+}
+
 struct Ui {
     config: Config,
     data: Option<Vec<(u8, String, bool)>>,
@@ -53,6 +59,7 @@ struct Ui {
     make_data_2_false: bool,
     pasted_contents: String,
     pasted_import_completed: Option<std::time::Instant>,
+    autosave_timer: std::time::Instant,
 }
 
 impl Ui {
@@ -70,10 +77,21 @@ impl Ui {
             .or_default()
             .insert(0, "roboto".to_owned());
         cc.egui_ctx.set_fonts(fonts);
-
+        let mut data = UiSave { data: None };
+        if let Ok(file) = File::open(".backup") {
+            if let Ok(mut decoder) = zstd::stream::Decoder::new(file) {
+                let mut buf = String::new();
+                let _ = decoder.read_to_string(&mut buf);
+                if &buf != "" {
+                    if let Ok(ui_save) = serde_json::from_str::<UiSave>(&buf) {
+                        data.data = ui_save.data;
+                    }
+                }
+            }
+        }
         Ui {
             config: get_config(),
-            data: None,
+            data: data.data,
             state: UiState::Main,
             paragraph_value: 0,
             slide: 0,
@@ -84,11 +102,20 @@ impl Ui {
             make_data_2_false: false,
             pasted_contents: "".to_string(),
             pasted_import_completed: None,
+            autosave_timer: std::time::Instant::now() + std::time::Duration::from_secs(20),
         }
     }
 }
 
 impl eframe::App for Ui {
+    fn on_exit(&mut self) {
+        if let Ok(json_string) = serde_json::to_string(&UiSave {
+            data: self.data.clone(),
+        }) {
+            let _ = autosave(json_string);
+        }
+    }
+
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         ui.add_space(16.0);
         ui.horizontal(|ui| {
@@ -125,6 +152,19 @@ impl eframe::App for Ui {
                 get_help();
             }
         });
+        if &self.pasted_contents != "" && self.state != UiState::Paste {
+            self.pasted_contents = "".to_string();
+        }
+        if self.autosave_timer <= std::time::Instant::now() {
+            self.autosave_timer = std::time::Instant::now() + std::time::Duration::from_secs(30);
+            if self.compute_scenes {
+                if let Ok(json_string) = serde_json::to_string(&UiSave {
+                    data: self.data.clone(),
+                }) {
+                    let _ = autosave(json_string);
+                }
+            }
+        }
         match self.state {
             UiState::Paste => {
                 ui.horizontal(|ui| {
@@ -154,6 +194,7 @@ impl eframe::App for Ui {
                         );
                         self.pasted_import_completed =
                             Some(std::time::Instant::now() + std::time::Duration::from_secs(3));
+                        self.compute_scenes = true;
                     }
                     if self.pasted_import_completed > Some(std::time::Instant::now()) {
                         ui.label(RichText::new("File Imported to Main!!").color(Color32::ORANGE));
@@ -343,6 +384,18 @@ impl eframe::App for Ui {
               //     },
         }
     }
+}
+
+fn autosave(data: String) -> std::io::Result<()> {
+    let tmp_path = ".backup.tmp";
+    let target_file = File::create(".backup")?;
+    let mut encoder = zstd::stream::Encoder::new(target_file, 3)?;
+    let _ = encoder.write_all(data.as_bytes());
+    let file = encoder.finish()?;
+    file.sync_all()?;
+    drop(file);
+    std::fs::rename(tmp_path, ".backup")?;
+    Ok(())
 }
 
 fn pressing_number(ui: &mut egui::Ui) -> (bool, u8) {
