@@ -6,7 +6,7 @@ use eframe::egui::{self, Color32, RichText, Vec2};
 use serde_derive::{Deserialize, Serialize};
 use std::{
     fs::File,
-    io::{read_to_string, BufRead, BufReader, Read, Write},
+    io::{BufRead, BufReader, Read, Write},
 };
 
 const NUMBER_MEANING: [&str; 10] = [
@@ -27,13 +27,13 @@ enum UiState {
     Preview,
     Main,
     Paste,
-    // Edit,
+    Edit,
 }
 
 impl UiState {
     fn get_state_string(&self) -> String {
         match self {
-            // UiState::Edit => "Edit Mode".to_string(),
+            UiState::Edit => "Edit Mode".to_string(),
             UiState::Preview => "Preview Mode".to_string(),
             UiState::Main => "Main Mode".to_string(),
             UiState::Paste => "Paste Bulletin".to_string(),
@@ -55,7 +55,6 @@ struct Ui {
     scenes: Vec<Scene>,
     compute_scenes: bool,
     file_save_text: Option<std::time::Instant>,
-    // editing_paragraph: Option<(String, usize)>,
     make_data_2_false: bool,
     pasted_contents: String,
     pasted_import_completed: Option<std::time::Instant>,
@@ -98,7 +97,6 @@ impl Ui {
             scenes: vec![],
             compute_scenes: false,
             file_save_text: None,
-            // editing_paragraph: None,
             make_data_2_false: false,
             pasted_contents: "".to_string(),
             pasted_import_completed: None,
@@ -141,11 +139,11 @@ impl eframe::App for Ui {
                             UiState::Paste,
                             RichText::new(UiState::Paste.get_state_string()).size(16.0),
                         );
-                        // ui.selectable_value(
-                        //     &mut self.state,
-                        //     UiState::Edit,
-                        //     RichText::new(UiState::Edit.get_state_string()).size(16.0),
-                        // );
+                        ui.selectable_value(
+                            &mut self.state,
+                            UiState::Edit,
+                            RichText::new(UiState::Edit.get_state_string()).size(16.0),
+                        );
                     });
             });
             if ui.button(RichText::new("Help").size(16.0)).clicked() {
@@ -166,6 +164,51 @@ impl eframe::App for Ui {
             }
         }
         match self.state {
+            UiState::Edit => {
+                ui.horizontal(|ui| {
+                    ui.add_space(16.0);
+                    if ui
+                        .button(RichText::new("Move Paragraph Up").size(16.0))
+                        .clicked()
+                    {
+                        if let Some(data) = &mut self.data {
+                            for i in 0..data.len() {
+                                if data[i].2 && i != 0 {
+                                    data[i].2 = false;
+                                    let temp = data[i].clone();
+                                    data[i] = data[i - 1].clone();
+                                    data[i - 1] = temp;
+                                }
+                            }
+                        }
+                    }
+                    if ui
+                        .button(RichText::new("Move Paragraph Down").size(16.0))
+                        .clicked()
+                    {
+                        if let Some(data) = &mut self.data {
+                            for i in 0..data.len() {
+                                if data[i].2 && i != data.len() {
+                                    data[i].2 = false;
+                                    let temp = data[i].clone();
+                                    data[i] = data[i + 1].clone();
+                                    data[i + 1] = temp;
+                                }
+                            }
+                        }
+                    }
+                });
+                // Add creed adding here
+                if let Some(data) = &mut self.data {
+                    egui::ScrollArea::vertical().show(ui, |ui| {
+                        for i in 0..data.len() {
+                            ui.horizontal(|ui| {
+                                display_row_edit(data, ui, i);
+                            });
+                        }
+                    });
+                }
+            }
             UiState::Paste => {
                 ui.horizontal(|ui| {
                     ui.add_space(16.0);
@@ -356,38 +399,13 @@ impl eframe::App for Ui {
                         );
                     });
                 }
-            } //     UiState::Edit => match &self.editing_paragraph {
-              //         Some((s, i)) => {}
-              //         _ => match &mut self.data {
-              //             Some(data) => {
-              //                 if self.make_data_2_false {
-              //                     for d in data.iter_mut() {
-              //                         d = (d.0, d.1, false);
-              //                     }
-              //                     self.make_data_2_false = false;
-              //                 }
-              //                 for (i, (_, s, b)) in data.iter().enumerate() {
-              //                     if b == &true {
-              //                         self.editing_paragraph = Some((s.clone(), i));
-              //                     }
-              //                 }
-              //                 egui::ScrollArea::vertical().show(ui, |ui| {
-              //                     for i in 0..data.len() {
-              //                         ui.horizontal(|ui| {
-              //                             display_row(data, ui, i);
-              //                         });
-              //                     }
-              //                 });
-              //             }
-              //             _ => (),
-              //         },
-              //     },
+            }
         }
     }
 }
 
 fn autosave(data: String) -> std::io::Result<()> {
-    let tmp_path = ".backup.tmp";
+    let tmp_path = ".tmpbck";
     let target_file = File::create(".backup")?;
     let mut encoder = zstd::stream::Encoder::new(target_file, 3)?;
     let _ = encoder.write_all(data.as_bytes());
@@ -476,12 +494,27 @@ fn display_row(data: &mut Vec<(u8, String, bool)>, ui: &mut egui::Ui, i: usize) 
     }
 }
 
+fn display_row_edit(data: &mut Vec<(u8, String, bool)>, ui: &mut egui::Ui, i: usize) {
+    ui.add_space(16.0);
+    ui.checkbox(&mut data[i].2, "");
+    let height = ui.available_height();
+    ui.add(
+        egui::TextEdit::multiline(&mut data[i].1)
+            .font(egui::FontId::monospace(16.0))
+            .margin(egui::Margin::ZERO)
+            .desired_rows(1)
+            .desired_width(f32::INFINITY)
+            .min_size(egui::vec2(0.0, height)),
+    );
+}
+
 pub fn ui() -> eframe::Result<()> {
     eframe::run_native(
         "OBS Church Automator",
         eframe::NativeOptions::default(),
         Box::new(|cc| {
             cc.egui_ctx.set_theme(egui::Theme::Dark);
+
             Ok(Box::new(Ui::new(cc)))
         }),
     )

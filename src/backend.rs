@@ -1,6 +1,6 @@
 use eframe::egui::Color32;
 use serde_derive::{Deserialize, Serialize};
-use std::fs;
+use std::{collections::HashSet, fs};
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 enum Source {
@@ -171,7 +171,7 @@ impl Main {
         });
     }
 }
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Hash)]
 struct Name {
     name: String,
 }
@@ -415,10 +415,13 @@ pub fn build_livestream(mut map: Vec<(u8, String)>) -> Main {
         // 0 and 7 are skipped
         if map[index].0 == 2 {
             let contents = &wrap_text(&map[index].1, 40);
-            main.add_scene(&format!("scn_{}", map[index].1));
+            main.add_scene(&format!(
+                "scn_{}",
+                map[index].1.lines().next().unwrap_or("")
+            ));
             main.add_text_obj(
-                &format!("txt_{}", map[index].1),
-                &format!("scn_{}", map[index].1),
+                &format!("txt_{}", map[index].1.lines().next().unwrap_or("")),
+                &format!("scn_{}", map[index].1.lines().next().unwrap_or("")),
                 contents,
                 50,
                 Position { x: 20.0, y: 20.0 },
@@ -429,16 +432,25 @@ pub fn build_livestream(mut map: Vec<(u8, String)>) -> Main {
                 contents.lines().count() > 21,
             );
         } else if map[index].0 == 3 {
-            main.add_scene(&format!("scn_{}", map[index].1));
+            main.add_scene(&format!(
+                "scn_{}",
+                map[index].1.lines().next().unwrap_or("")
+            ));
         } else if map[index].0 == 5 {
             if index + 1 >= map.len() || map[index + 1].0 != 5 {
-                main.add_scene(&format!("scn_{}", map[index].1));
+                main.add_scene(&format!(
+                    "scn_{}",
+                    map[index].1.lines().next().unwrap_or("")
+                ));
             }
         } else if map[index].0 == 4 || map[index].0 == 1 || map[index].0 == 8 {
-            main.add_scene(&format!("scn_{}", map[index].1));
+            main.add_scene(&format!(
+                "scn_{}",
+                map[index].1.lines().next().unwrap_or("")
+            ));
             main.add_text_obj(
-                &format!("txt_{}", map[index].1),
-                &format!("scn_{}", map[index].1),
+                &format!("txt_{}", map[index].1.lines().next().unwrap_or("")),
+                &format!("scn_{}", map[index].1.lines().next().unwrap_or("")),
                 &wrap_text(&map[index].1, 75),
                 50,
                 Position { x: 0.0, y: 0.0 },
@@ -450,6 +462,12 @@ pub fn build_livestream(mut map: Vec<(u8, String)>) -> Main {
             );
         }
         index += 1;
+    }
+    let mut seen: HashSet<String> = HashSet::new();
+    for scene in &mut main.scene_order {
+        while !seen.insert(scene.name.clone()) {
+            scene.name.push(' ');
+        }
     }
     main
 }
